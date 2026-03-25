@@ -224,7 +224,7 @@ class AuthController
         if (Auth::check()) {
             View::redirect('/dashboard');
         }
-        View::render('auth/login-email', [], 'auth');
+        View::render('auth/login', [], 'auth');
     }
 
     public function loginEmail(): void

@@ -19,6 +19,7 @@ $router = new Router();
 $router->get('/login',               'AuthController@login');
 $router->get('/register',            'AuthController@registerForm');
 $router->post('/register',           'AuthController@register');
+$router->get('/login/email',         'AuthController@loginEmailForm');
 $router->post('/login/email',        'AuthController@loginEmail');
 $router->get('/auth/verify-email',   'AuthController@verifyEmail');
 $router->get('/forgot-password',     'AuthController@forgotPasswordForm');
