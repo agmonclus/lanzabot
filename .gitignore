@@ -1,0 +1,49 @@
+# Variables de entorno — NUNCA versionar
+.env
+.env.local
+.env.*.local
+
+# Dependencias PHP
+/vendor/
+
+# Uploads de usuarios (código de bots)
+/uploads/*
+!/uploads/.gitkeep
+
+# Logs
+/storage/logs/*.log
+!/storage/logs/.gitkeep
+
+# Directorio de trabajo interno
+/lanzabot/*
+!/lanzabot/.gitkeep
+
+# Cache y archivos generados
+*.cache
+*.tmp
+*.swp
+*.swo
+*~
+
+# IDEs
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Composer
+composer.phar
+
+# PHPUnit
+.phpunit.result.cache
+/coverage/
+
+# Node (si se añade build frontend en el futuro)
+node_modules/
+npm-debug.log*
+yarn-error.log*

@@ -1,0 +1,22 @@
+Options -Indexes
+RewriteEngine On
+
+# Don't rewrite actual files/directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route everything to index.php
+RewriteRule ^ index.php [QSA,L]
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Referrer-Policy "same-origin"
+</IfModule>
+
+# Deny access to sensitive files
+<FilesMatch "(\.env|composer\.json|composer\.lock)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

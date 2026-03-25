@@ -1,0 +1,29 @@
+Quiero poner en marcha una pagina web/ portal del cliente de un negocio que estoy montando que se llama lanzabot.com. 
+
+Haz la web en php vanila y mariadb, modelo vista controlador. Mariadb y php ya están instalados en local, si necesitas algo más, como una libreria php, instálalo. Las credenciales mariadb son usuario alfredo contraseña crealogica host localhost base de datos lanzabot .
+
+El negocio consiste en la venta de alojamiento para bots de telegram y discord (en el futuro, otros). El marketing que voy a usar gira alrededor de "Despliega tu bot en 1 minuto".
+
+El usuario se registra mediante SSO de google, discord o telegram.
+
+Cuando está logueado aterriza en su dashboard, donde hay la lista de bots que posee y un botón de "Desplegar nuevo bot".
+
+Los planes de alojamiento son los siguientes:
+1) free: solo 1 bot pequeño (128mb de ram). Sin base de datos
+2) medium: 500mb ram, hasta 4 bots. 10gb espacio en disco. 1 base de datos: 1€/semana
+3) starter: 1gb ram, hasta 6 bots. 2 bases de datos. 2€/semana
+3) pro: 2gb ram, hasta 8 bots. 4 bases de datos. 50 gb espacio. 5€/semana
+4) custom: presenta un formulario que pide los datos clave para hacer un presu a medida.
+
+La suscripcion es mediante stripe. Dejalo todo preparado y haz documentacion de lo que tengo que hacer para configurarlo.
+
+Para la creacion de contenedores para los bots tenemos un servidor Coolify recién instalado en la dirección 37.59.113.81. Usa su API en combinación con la base de datos mysql para realizar todoas las operaciones necesarias.
+
+Dentro de la página del bot, además de poder subir el código, credenciales etc., el usuario tiene acceso a estadísticas de uso via api con coolify y a ver los logs en tiempo real (no estrictamente tiene que ser tiempo real, puede ser con ajax cada x segundos)
+
+Además en el dashboard hay el listado de los pagos y un link a stripe para manejar la suscripcion.
+
+
+Haz un diseño minimalista y la interfaz más sencilla posible para posibilitar el deploy más rápido posible de los bots.
+
+Dejame también documentación de lo que tengo que configurar en coolify, en el archivo .env de la aplicación, y todas las cosas que debo hacer para poner esto en marcha.
