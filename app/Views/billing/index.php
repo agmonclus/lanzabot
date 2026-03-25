@@ -13,8 +13,8 @@
                 <span class="plan-badge"><?= strtoupper(\App\Core\View::e($plan['slug'] ?? 'free')) ?></span>
                 <strong><?= \App\Core\View::e($plan['name'] ?? 'Free') ?></strong>
                 <span class="text-muted ml-2">
-                    <?php if ($plan['price_weekly'] > 0): ?>
-                        <?= number_format($plan['price_weekly'], 2) ?>€/semana
+                    <?php if ($plan['price_monthly'] > 0): ?>
+                        $<?= number_format($plan['price_monthly'], 2) ?>/mes
                     <?php else: ?>
                         Gratuito
                     <?php endif; ?>

@@ -9,7 +9,7 @@ class Subscription
     public static function getActiveForUser(int $userId): ?array
     {
         return Database::fetch(
-            "SELECT s.*, p.slug as plan_slug, p.name as plan_name, p.max_bots, p.ram_mb, p.disk_gb, p.max_databases, p.price_weekly
+            "SELECT s.*, p.slug as plan_slug, p.name as plan_name, p.max_bots, p.ram_mb, p.disk_gb, p.disk_temp_mb, p.max_databases, p.price_monthly, p.has_eco_mode, p.has_redis, p.has_backups
              FROM subscriptions s
              JOIN plans p ON p.id = s.plan_id
              WHERE s.user_id = ? AND s.status IN ('active', 'trialing', 'free')

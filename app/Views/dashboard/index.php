@@ -17,9 +17,11 @@
         <span>
             <?= count($bots) ?> / <?= $plan['max_bots'] > 0 ? $plan['max_bots'] : '∞' ?> bots
             &nbsp;·&nbsp;
-            <?= $plan['ram_mb'] ?>MB RAM
+            <?= $plan['ram_mb'] >= 1024 ? number_format($plan['ram_mb'] / 1024, 1) . ' GB' : $plan['ram_mb'] . ' MB' ?> RAM
             <?php if ($plan['disk_gb'] > 0): ?>
-                &nbsp;·&nbsp; <?= $plan['disk_gb'] ?>GB disco
+                &nbsp;·&nbsp; <?= $plan['disk_gb'] ?> GB disco permanente
+            <?php elseif (!empty($plan['disk_temp_mb']) && $plan['disk_temp_mb'] > 0): ?>
+                &nbsp;·&nbsp; <?= $plan['disk_temp_mb'] ?> MB disco temporal
             <?php endif; ?>
         </span>
     </div>

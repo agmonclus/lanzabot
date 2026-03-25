@@ -41,11 +41,15 @@ CREATE TABLE IF NOT EXISTS plans (
     id INT AUTO_INCREMENT PRIMARY KEY,
     slug VARCHAR(50) UNIQUE NOT NULL,
     name VARCHAR(100) NOT NULL,
-    price_weekly DECIMAL(10,2) NOT NULL DEFAULT 0,
+    price_monthly DECIMAL(10,2) NOT NULL DEFAULT 0,
     max_bots INT NOT NULL DEFAULT 1,
     ram_mb INT NOT NULL DEFAULT 128,
     disk_gb INT NOT NULL DEFAULT 0,
+    disk_temp_mb INT NOT NULL DEFAULT 0,
     max_databases INT NOT NULL DEFAULT 0,
+    has_eco_mode TINYINT(1) DEFAULT 0,
+    has_redis TINYINT(1) DEFAULT 0,
+    has_backups TINYINT(1) DEFAULT 0,
     stripe_price_id VARCHAR(255),
     is_active BOOLEAN DEFAULT TRUE,
     sort_order INT DEFAULT 0
@@ -104,11 +108,15 @@ CREATE TABLE IF NOT EXISTS payments (
     INDEX idx_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Seed plans
-INSERT INTO plans (slug, name, price_weekly, max_bots, ram_mb, disk_gb, max_databases, sort_order) VALUES
-('free',    'Free',    0.00, 1, 128,  0,  0, 1),
-('medium',  'Medium',  1.00, 4, 500,  10, 1, 2),
-('starter', 'Starter', 2.00, 6, 1024, 20, 2, 3),
-('pro',     'Pro',     5.00, 8, 2048, 50, 4, 4),
-('custom',  'Custom',  0.00, 0, 0,    0,  0, 5)
-ON DUPLICATE KEY UPDATE slug=slug;
+-- Seed plans (2026)
+INSERT INTO plans (slug, name, price_monthly, max_bots, ram_mb, disk_gb, disk_temp_mb, max_databases, has_eco_mode, has_redis, has_backups, sort_order) VALUES
+('free',    'Free',    0.00,  1,  256,  0,   500, 0, 1, 0, 0, 1),
+('starter', 'Starter', 5.99,  4,  1024, 15,  0,   1, 0, 0, 0, 2),
+('medium',  'Medium',  11.99, 10, 2560, 40,  0,   2, 0, 0, 0, 3),
+('pro',     'Pro',     24.99, 25, 6144, 100, 0,   5, 0, 1, 1, 4),
+('custom',  'Custom',  0.00,  0,  0,    0,   0,   0, 0, 0, 0, 5)
+ON DUPLICATE KEY UPDATE
+    name=VALUES(name), price_monthly=VALUES(price_monthly), max_bots=VALUES(max_bots),
+    ram_mb=VALUES(ram_mb), disk_gb=VALUES(disk_gb), disk_temp_mb=VALUES(disk_temp_mb),
+    max_databases=VALUES(max_databases), has_eco_mode=VALUES(has_eco_mode),
+    has_redis=VALUES(has_redis), has_backups=VALUES(has_backups), sort_order=VALUES(sort_order);

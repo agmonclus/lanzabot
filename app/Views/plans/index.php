@@ -1,7 +1,22 @@
 <?php $pageTitle = 'Planes'; ?>
+<?php
+$subtitles = [
+    'free'    => 'El Laboratorio',
+    'starter' => 'El Lanzamiento',
+    'medium'  => 'Potencia Total',
+    'pro'     => 'La Central de Bots',
+];
+$planEmojis = ['free' => '🥚', 'starter' => '🌱', 'medium' => '🚀', 'pro' => '👑'];
+$highlights = [
+    'free'    => '🍃 <strong>Modo Eco (Hibernación):</strong> Si tu bot no tiene actividad o no visitas el panel en 7 días, entrará en "Modo Eco". ¿Quieres volver? Dale a <em>Despertar</em> desde el panel y estará online en segundos.',
+    'starter' => '💾 <strong>Disco Permanente:</strong> Toda la información que tu bot guarde (SQLite, archivos JSON, niveles de usuarios) sobrevivirá a cualquier reinicio o actualización.',
+    'medium'  => '🚀 <strong>Rendimiento Garantizado:</strong> Con almacenamiento de alta velocidad y mayor memoria, tus bots responderán de forma instantánea incluso en horas pico.',
+    'pro'     => '🏗️ <strong>Infraestructura de Élite:</strong> El plan más robusto para quienes necesitan máxima persistencia, sistemas complejos con bases de datos pesadas o grandes volúmenes de caché.',
+];
+?>
 <div class="page-header">
-    <h1>Planes de alojamiento</h1>
-    <p class="text-muted">Escala según tus necesidades. Sin permanencia.</p>
+    <h1>💎 Planes de Alojamiento</h1>
+    <p class="text-muted">Sin permanencia. Cancela cuando quieras.</p>
 </div>
 
 <div class="plans-grid">
@@ -9,21 +24,43 @@
 <?php $isCurrent = ($current['slug'] === $plan['slug']); ?>
 <div class="plan-card <?= $isCurrent ? 'plan-current' : '' ?> <?= $plan['slug'] === 'pro' ? 'plan-featured' : '' ?>">
     <?php if ($plan['slug'] === 'pro'): ?><div class="plan-tag">Popular</div><?php endif; ?>
+    <div class="plan-emoji"><?= $planEmojis[$plan['slug']] ?? '' ?></div>
     <div class="plan-name"><?= \App\Core\View::e($plan['name']) ?></div>
+    <?php if (isset($subtitles[$plan['slug']])): ?>
+        <div class="plan-subtitle"><?= $subtitles[$plan['slug']] ?></div>
+    <?php endif; ?>
     <div class="plan-price">
-        <?php if ($plan['price_weekly'] > 0): ?>
-            <span class="price-amount"><?= number_format($plan['price_weekly'], 0) ?>€</span>
-            <span class="price-period">/semana</span>
+        <?php if ($plan['price_monthly'] > 0): ?>
+            <span class="price-amount">$<?= number_format($plan['price_monthly'], 2) ?></span>
+            <span class="price-period">/mes</span>
         <?php else: ?>
             <span class="price-amount">Gratis</span>
         <?php endif; ?>
     </div>
     <ul class="plan-features">
-        <li>✓ <?= $plan['max_bots'] ?> bot<?= $plan['max_bots'] > 1 ? 's' : '' ?></li>
-        <li>✓ <?= $plan['ram_mb'] >= 1024 ? ($plan['ram_mb'] / 1024) . 'GB' : $plan['ram_mb'] . 'MB' ?> RAM</li>
-        <?php if ($plan['disk_gb'] > 0): ?><li>✓ <?= $plan['disk_gb'] ?>GB disco</li><?php else: ?><li class="text-muted">– Sin disco</li><?php endif; ?>
-        <?php if ($plan['max_databases'] > 0): ?><li>✓ <?= $plan['max_databases'] ?> base<?= $plan['max_databases'] > 1 ? 's' : '' ?> de datos</li><?php else: ?><li class="text-muted">– Sin base de datos</li><?php endif; ?>
+        <li>✓ <?= $plan['max_bots'] ?> bot<?= $plan['max_bots'] > 1 ? 's (Slots)' : '' ?></li>
+        <li>✓ <?= $plan['ram_mb'] >= 1024 ? number_format($plan['ram_mb'] / 1024, 1) . ' GB' : $plan['ram_mb'] . ' MB' ?> RAM</li>
+        <?php if ($plan['disk_gb'] > 0): ?>
+            <li>✓ <?= $plan['disk_gb'] ?> GB Disco Permanente</li>
+        <?php elseif ($plan['disk_temp_mb'] > 0): ?>
+            <li>✓ <?= $plan['disk_temp_mb'] ?> MB Disco Temporal</li>
+        <?php else: ?>
+            <li class="text-muted">– Sin disco</li>
+        <?php endif; ?>
+        <?php if ($plan['max_databases'] > 0): ?>
+            <li>✓ <?= $plan['max_databases'] ?> base<?= $plan['max_databases'] > 1 ? 's' : '' ?> de datos</li>
+        <?php else: ?>
+            <li class="text-muted">– Sin base de datos</li>
+        <?php endif; ?>
+        <?php if ($plan['has_redis']): ?><li>✓ Redis (caché ultra rápida)</li><?php endif; ?>
+        <?php if ($plan['has_backups']): ?><li>✓ Backups automáticos</li><?php endif; ?>
+        <?php if (in_array($plan['slug'], ['medium', 'pro'])): ?><li>✓ Soporte prioritario</li><?php endif; ?>
     </ul>
+    <?php if (isset($highlights[$plan['slug']])): ?>
+    <div class="plan-highlight">
+        <p><?= $highlights[$plan['slug']] ?></p>
+    </div>
+    <?php endif; ?>
     <?php if ($isCurrent): ?>
         <div class="plan-current-badge">Plan actual</div>
     <?php elseif ($plan['slug'] !== 'free'): ?>
@@ -37,6 +74,25 @@
     <?php endif; ?>
 </div>
 <?php endforeach; ?>
+</div>
+
+<!-- FAQ / Glosario -->
+<div class="faq-section">
+    <h2>🧐 Preguntas frecuentes</h2>
+    <div class="faq-grid">
+        <div class="faq-item">
+            <h4>¿Qué es el Disco Temporal (Plan Free)?</h4>
+            <p>Imagínalo como una pizarra: puedes escribir en ella, pero si borramos la pizarra (reiniciar el bot), los datos desaparecen. No es apto para guardar memoria a largo plazo.</p>
+        </div>
+        <div class="faq-item">
+            <h4>¿Qué es el Disco Permanente (Planes de Pago)?</h4>
+            <p>Es como un cuaderno: lo que escribes con bolígrafo se queda ahí aunque cierres el cuaderno. Esencial si tu bot tiene economía, niveles o configuraciones personalizadas de usuarios.</p>
+        </div>
+        <div class="faq-item">
+            <h4>¿El Modo Eco borra mi bot?</h4>
+            <p>¡Nunca! Solo lo pone a dormir para que no consuma recursos. Tu código y ajustes siempre estarán esperándote cuando decidas activarlo de nuevo desde el panel.</p>
+        </div>
+    </div>
 </div>
 
 <!-- Custom plan -->
