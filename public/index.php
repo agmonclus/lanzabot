@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-define('ROOT', dirname(__DIR__));
+define('ROOT', realpath(__DIR__ . '/..') ?: dirname(__DIR__));
 
 require ROOT . '/vendor/autoload.php';
 require ROOT . '/config/config.php';
