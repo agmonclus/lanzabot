@@ -3,6 +3,9 @@
 .env.local
 .env.*.local
 
+# Dependencias PHP
+/vendor/
+
 # Uploads de usuarios (código de bots)
 /uploads/*
 !/uploads/.gitkeep
