@@ -39,6 +39,8 @@ $router->get('/dashboard', 'DashboardController@index');
 
 // Bots
 $router->get('/bots/create',                'BotController@create');
+$router->get('/bots/from-template/{id}',    'BotController@fromTemplate');
+$router->post('/bots/from-template/{id}',   'BotController@storeFromTemplate');
 $router->post('/bots',                      'BotController@store');
 $router->get('/bots/{id}',                  'BotController@show');
 $router->post('/bots/{id}/upload',          'BotController@upload');
@@ -60,6 +62,20 @@ $router->post('/plans/custom',      'PlanController@customRequest');
 $router->get('/billing',         'BillingController@index');
 $router->get('/billing/portal',  'BillingController@portal');
 $router->post('/stripe/webhook', 'BillingController@webhook');
+
+// Admin
+$router->get('/admin',                          'AdminController@index');
+$router->get('/admin/users',                    'AdminController@users');
+$router->get('/admin/bots',                     'AdminController@bots');
+$router->get('/admin/subscriptions',            'AdminController@subscriptions');
+$router->get('/admin/payments',                 'AdminController@payments');
+$router->get('/admin/plans',                    'AdminController@plans');
+$router->get('/admin/templates',                'AdminController@templates');
+$router->get('/admin/templates/create',         'AdminController@templateCreate');
+$router->post('/admin/templates',               'AdminController@templateStore');
+$router->get('/admin/templates/{id}/edit',      'AdminController@templateEdit');
+$router->post('/admin/templates/{id}/update',   'AdminController@templateUpdate');
+$router->post('/admin/templates/{id}/delete',   'AdminController@templateDelete');
 
 // Dispatch
 $method = $_SERVER['REQUEST_METHOD'];

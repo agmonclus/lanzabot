@@ -6,22 +6,165 @@ use App\Core\Auth;
 use App\Core\View;
 use App\Core\CoolifyAPI;
 use App\Models\Bot;
+use App\Models\BotTemplate;
 
 class BotController
 {
+    private static array $planOrder = [
+        'free' => 0, 'starter' => 1, 'medium' => 2, 'pro' => 3, 'custom' => 4
+    ];
+
     public function create(): void
     {
         Auth::require();
         $user = Auth::user();
         $plan = Auth::plan();
+        $isAdmin = (int)$user['id'] === 1;
 
-        $botCount = Bot::countForUser($user['id']);
-        if ($plan['max_bots'] > 0 && $botCount >= $plan['max_bots']) {
-            Auth::flash('error', 'Has alcanzado el límite de bots de tu plan. Actualiza tu plan para añadir más.');
+        $botCount     = Bot::countForUser($user['id']);
+        $canCreateMore = $isAdmin || $plan['max_bots'] <= 0 || $botCount < $plan['max_bots'];
+        $templates    = BotTemplate::all();
+        $planOrder    = self::$planOrder;
+        $userPlanOrder = $planOrder[$plan['slug']] ?? 0;
+
+        View::render('bots/create', compact(
+            'user', 'plan', 'templates', 'botCount',
+            'isAdmin', 'canCreateMore', 'planOrder', 'userPlanOrder'
+        ));
+    }
+
+    public function fromTemplate(string $id): void
+    {
+        Auth::require();
+        $user = Auth::user();
+        $plan = Auth::plan();
+        $isAdmin = (int)$user['id'] === 1;
+
+        $template = BotTemplate::find((int)$id);
+        if (!$template) {
+            Auth::flash('error', 'Plantilla no encontrada.');
+            View::redirect('/bots/create');
+        }
+
+        // Verificar plan mínimo
+        $userPlanOrder = self::$planOrder[$plan['slug']] ?? 0;
+        $reqPlanOrder  = self::$planOrder[$template['min_plan_slug']] ?? 0;
+        if (!$isAdmin && $userPlanOrder < $reqPlanOrder) {
+            Auth::flash('error', 'Necesitas un plan ' . ucfirst($template['min_plan_slug']) . ' o superior para esta plantilla.');
             View::redirect('/plans');
         }
 
-        View::render('bots/create', compact('user', 'plan'));
+        // Verificar límite de bots
+        $botCount = Bot::countForUser($user['id']);
+        if (!$isAdmin && $plan['max_bots'] > 0 && $botCount >= $plan['max_bots']) {
+            Auth::flash('error', 'Has alcanzado el límite de bots de tu plan.');
+            View::redirect('/plans');
+        }
+
+        $requiredVars = json_decode($template['required_env_vars'], true) ?? [];
+        $defaultVars  = json_decode($template['default_env_vars'], true) ?? [];
+
+        View::render('bots/setup-template', compact(
+            'user', 'plan', 'template', 'requiredVars', 'defaultVars', 'isAdmin'
+        ));
+    }
+
+    public function storeFromTemplate(string $id): void
+    {
+        Auth::require();
+        $this->verifyCsrf();
+
+        $user = Auth::user();
+        $plan = Auth::plan();
+        $isAdmin = (int)$user['id'] === 1;
+
+        $template = BotTemplate::find((int)$id);
+        if (!$template) {
+            Auth::flash('error', 'Plantilla no encontrada.');
+            View::redirect('/bots/create');
+        }
+
+        // Verificar permisos
+        $userPlanOrder = self::$planOrder[$plan['slug']] ?? 0;
+        $reqPlanOrder  = self::$planOrder[$template['min_plan_slug']] ?? 0;
+        if (!$isAdmin && $userPlanOrder < $reqPlanOrder) {
+            Auth::flash('error', 'Plan insuficiente para esta plantilla.');
+            View::redirect('/plans');
+        }
+
+        $botCount = Bot::countForUser($user['id']);
+        if (!$isAdmin && $plan['max_bots'] > 0 && $botCount >= $plan['max_bots']) {
+            Auth::flash('error', 'Límite de bots alcanzado.');
+            View::redirect('/dashboard');
+        }
+
+        // Recoger nombre personalizado
+        $botName = trim($_POST['bot_name'] ?? $template['name']);
+        if (!$botName) $botName = $template['name'];
+
+        // Recoger variables de entorno
+        $requiredVars = json_decode($template['required_env_vars'], true) ?? [];
+        $defaultVars  = json_decode($template['default_env_vars'], true) ?? [];
+        $envVars = $defaultVars;
+
+        foreach ($requiredVars as $varDef) {
+            $key   = $varDef['key'] ?? '';
+            $value = trim($_POST['env_' . $key] ?? '');
+            if (!empty($varDef['required']) && $value === '') {
+                Auth::flash('error', 'El campo "' . ($varDef['label'] ?? $key) . '" es obligatorio.');
+                View::redirect('/bots/from-template/' . $id);
+            }
+            if ($value !== '') {
+                $envVars[$key] = $value;
+            }
+        }
+
+        // Crear bot en BD
+        $botId = Bot::create([
+            'user_id'      => $user['id'],
+            'name'         => $botName,
+            'platform'     => $template['platform'],
+            'description'  => $template['short_description'],
+            'docker_image' => $template['docker_image'],
+            'template_id'  => $template['id'],
+        ]);
+
+        // Guardar env vars
+        Bot::setEnvVars($botId, $envVars);
+
+        // Desplegar en Coolify
+        $deployed = false;
+        $deployError = '';
+        try {
+            $ramMb = $plan['ram_mb'] ?? 128;
+            $slug  = preg_replace('/[^a-z0-9]/', '-', strtolower($botName)) . '-' . $botId;
+            $result = CoolifyAPI::createApplication($slug, $template['docker_image'], $envVars, $ramMb);
+
+            if (!empty($result['uuid'])) {
+                Bot::update($botId, [
+                    'coolify_app_uuid' => $result['uuid'],
+                    'coolify_status'   => 'deploying',
+                ]);
+                CoolifyAPI::deploy($result['uuid']);
+                Bot::update($botId, ['coolify_status' => 'running']);
+                $deployed = true;
+            } else {
+                $deployError = $result['error'] ?? 'Coolify no devolvió UUID.';
+            }
+        } catch (\Exception $e) {
+            $deployError = $e->getMessage();
+        }
+
+        BotTemplate::incrementInstallCount($template['id']);
+
+        $bot = Bot::find($botId);
+        $setupInstructions = $template['setup_instructions'] ?? '';
+        $docUrl = $template['documentation_url'] ?? '';
+
+        View::render('bots/deployed', compact(
+            'user', 'bot', 'template', 'deployed', 'deployError',
+            'setupInstructions', 'docUrl', 'envVars'
+        ));
     }
 
     public function store(): void

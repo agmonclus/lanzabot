@@ -1,0 +1,208 @@
+/* ============================================================
+   Lanzabot — Admin Panel Styles
+   ============================================================ */
+
+/* Admin sidebar accent */
+.sidebar-admin {
+    border-right-color: var(--accent);
+}
+.sidebar-admin .sidebar-brand {
+    background: var(--accent-lt);
+}
+.sidebar-admin .sidebar-brand a {
+    color: var(--accent);
+}
+
+/* Stats grid */
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--shadow);
+    position: relative;
+}
+
+.stat-card-icon {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+}
+
+.stat-card-data {
+    flex: 1;
+}
+
+.stat-card-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text);
+}
+
+.stat-card-label {
+    font-size: .8rem;
+    color: var(--muted);
+    margin-top: .1rem;
+}
+
+.stat-card-extra {
+    position: absolute;
+    top: .6rem;
+    right: .8rem;
+    font-size: .7rem;
+    color: var(--muted);
+    background: var(--bg);
+    padding: .15rem .45rem;
+    border-radius: 3px;
+}
+
+/* Plans distribution bar */
+.admin-plans-bar {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.plan-bar-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: .75rem 1.25rem;
+    text-align: center;
+    min-width: 100px;
+    box-shadow: var(--shadow);
+}
+
+.plan-bar-label {
+    font-size: .8rem;
+    color: var(--muted);
+    margin-bottom: .25rem;
+}
+
+.plan-bar-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+/* Two columns layout */
+.admin-two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .admin-two-cols {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Form rows */
+.form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.form-row .form-group {
+    min-width: 0;
+}
+
+/* Override table for admin */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .875rem;
+}
+
+.table th {
+    text-align: left;
+    padding: .6rem .75rem;
+    border-bottom: 2px solid var(--border);
+    font-weight: 600;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+.table td {
+    padding: .55rem .75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.table tbody tr:hover {
+    background: var(--bg);
+}
+
+/* Extra badge colors */
+.badge-info {
+    background: var(--accent-lt);
+    color: var(--accent);
+}
+
+.badge-danger {
+    background: #f8d7da;
+    color: var(--danger);
+}
+
+/* Button extras */
+.btn-xs {
+    padding: .2rem .5rem;
+    font-size: .75rem;
+    border-radius: 4px;
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+.btn-danger:hover {
+    background: #bb2d3b;
+}
+
+/* Card padding override */
+.card .card-body.p-0 {
+    padding: 0;
+}
+
+/* breadcrumb link */
+.breadcrumb {
+    color: var(--muted);
+    font-size: .85rem;
+    display: inline-block;
+    margin-bottom: .35rem;
+}
+.breadcrumb:hover {
+    color: var(--accent);
+}
+
+/* form card width */
+.form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+/* required star */
+.required {
+    color: var(--danger);
+}

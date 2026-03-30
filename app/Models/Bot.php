@@ -33,13 +33,14 @@ class Bot
     public static function create(array $data): int
     {
         return Database::insert(
-            'INSERT INTO bots (user_id, name, platform, description, docker_image) VALUES (?, ?, ?, ?, ?)',
+            'INSERT INTO bots (user_id, name, platform, description, docker_image, template_id) VALUES (?, ?, ?, ?, ?, ?)',
             [
                 $data['user_id'],
                 $data['name'],
                 $data['platform']     ?? 'telegram',
                 $data['description']  ?? '',
                 $data['docker_image'] ?? 'python:3.11-slim',
+                $data['template_id']  ?? null,
             ]
         );
     }
