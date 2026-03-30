@@ -34,8 +34,9 @@ RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' \
     sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' \
     /etc/apache2/apache2.conf
 
-# Permisos correctos
-RUN chown -R www-data:www-data /var/www/html && \
+# Crear directorios necesarios y establecer permisos correctos
+RUN mkdir -p uploads storage && \
+    chown -R www-data:www-data /var/www/html && \
     chmod -R 750 uploads storage
 
 EXPOSE 80
