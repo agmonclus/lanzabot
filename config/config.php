@@ -3,7 +3,7 @@
 use Dotenv\Dotenv;
 
 $dotenv = Dotenv::createImmutable(dirname(__DIR__));
-$dotenv->load();
+$dotenv->safeLoad();
 
 define('APP_ENV',    $_ENV['APP_ENV'] ?? 'production');
 define('APP_URL',    rtrim($_ENV['APP_URL'] ?? '', '/'));
