@@ -8,7 +8,10 @@ $platformIcons = [
 $categoryLabels = [
     'starter' => '🚀 Inicio', 'ai' => '🧠 IA', 'entertainment' => '🎵 Entretenimiento',
     'moderation' => '🛡️ Moderación', 'utility' => '🔧 Utilidad', 'ecommerce' => '🛒 Comercio',
-    'social' => '📣 Social', 'monitoring' => '📊 Monitoreo', 'developer' => '⚙️ Desarrollo'
+    'commerce' => '🛒 Comercio', 'social' => '📣 Social', 'monitoring' => '📊 Monitoreo',
+    'developer' => '⚙️ Desarrollo', 'finance' => '💰 Finanzas', 'gaming' => '🕹️ Gaming',
+    'education' => '📚 Educación', 'marketing' => '📢 Marketing', 'security' => '🔐 Seguridad',
+    'productivity' => '⏱️ Productividad'
 ];
 $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanzado'];
 $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'danger'];
@@ -41,18 +44,40 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
 </div>
 
 <!-- Filtros por plataforma -->
-<div class="tpl-filters">
-    <button class="tpl-filter active" data-filter="all">Todos</button>
-    <button class="tpl-filter" data-filter="telegram">✈️ Telegram</button>
-    <button class="tpl-filter" data-filter="discord">🎮 Discord</button>
-    <button class="tpl-filter" data-filter="slack">💬 Slack</button>
-    <button class="tpl-filter" data-filter="whatsapp">📱 WhatsApp</button>
-    <button class="tpl-filter" data-filter="twitch">🎮 Twitch</button>
-    <button class="tpl-filter" data-filter="reddit">🔶 Reddit</button>
-    <button class="tpl-filter" data-filter="mastodon">🐘 Mastodon</button>
-    <button class="tpl-filter" data-filter="matrix">🟢 Matrix</button>
-    <button class="tpl-filter" data-filter="multi">🌐 Multi</button>
-    <button class="tpl-filter" data-filter="ai">🧠 IA</button>
+<div style="margin-bottom:.5rem"><small class="text-muted"><strong>Plataforma:</strong></small></div>
+<div class="tpl-filters" id="platformFilters">
+    <button class="tpl-filter active" data-filter="all" data-type="platform">Todas</button>
+    <button class="tpl-filter" data-filter="telegram" data-type="platform">✈️ Telegram</button>
+    <button class="tpl-filter" data-filter="discord" data-type="platform">🎮 Discord</button>
+    <button class="tpl-filter" data-filter="slack" data-type="platform">💬 Slack</button>
+    <button class="tpl-filter" data-filter="whatsapp" data-type="platform">📱 WhatsApp</button>
+    <button class="tpl-filter" data-filter="twitch" data-type="platform">🎮 Twitch</button>
+    <button class="tpl-filter" data-filter="reddit" data-type="platform">🔶 Reddit</button>
+    <button class="tpl-filter" data-filter="mastodon" data-type="platform">🐘 Mastodon</button>
+    <button class="tpl-filter" data-filter="matrix" data-type="platform">🟢 Matrix</button>
+    <button class="tpl-filter" data-filter="multi" data-type="platform">🌐 Multi</button>
+</div>
+
+<!-- Filtros por funcionalidad -->
+<div style="margin-bottom:.5rem"><small class="text-muted"><strong>Funcionalidad:</strong></small></div>
+<div class="tpl-filters" id="categoryFilters">
+    <button class="tpl-filter active" data-filter="all" data-type="category">Todas</button>
+    <button class="tpl-filter" data-filter="ai" data-type="category">🧠 IA</button>
+    <button class="tpl-filter" data-filter="productivity" data-type="category">⏱️ Productividad</button>
+    <button class="tpl-filter" data-filter="commerce" data-type="category">🛒 Comercio</button>
+    <button class="tpl-filter" data-filter="ecommerce" data-type="category">🛒 E-Commerce</button>
+    <button class="tpl-filter" data-filter="finance" data-type="category">💰 Finanzas</button>
+    <button class="tpl-filter" data-filter="entertainment" data-type="category">🎵 Entretenimiento</button>
+    <button class="tpl-filter" data-filter="gaming" data-type="category">🕹️ Gaming</button>
+    <button class="tpl-filter" data-filter="moderation" data-type="category">🛡️ Moderación</button>
+    <button class="tpl-filter" data-filter="security" data-type="category">🔐 Seguridad</button>
+    <button class="tpl-filter" data-filter="social" data-type="category">📣 Social</button>
+    <button class="tpl-filter" data-filter="education" data-type="category">📚 Educación</button>
+    <button class="tpl-filter" data-filter="marketing" data-type="category">📢 Marketing</button>
+    <button class="tpl-filter" data-filter="monitoring" data-type="category">📊 Monitoreo</button>
+    <button class="tpl-filter" data-filter="developer" data-type="category">⚙️ Desarrollo</button>
+    <button class="tpl-filter" data-filter="utility" data-type="category">🔧 Utilidad</button>
+    <button class="tpl-filter" data-filter="starter" data-type="category">🚀 Inicio</button>
 </div>
 
 <!-- Catálogo de plantillas -->
@@ -74,6 +99,7 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
             <span class="tpl-icon"><?= $t['icon'] ?></span>
             <div class="tpl-badges">
                 <span class="badge badge-platform badge-<?= $platform ?>"><?= $platformIcons[$platform] ?? '⚙️' ?> <?= ucfirst($platform) ?></span>
+                <span class="badge badge-category"><?= $categoryLabels[$category] ?? ucfirst($category) ?></span>
                 <span class="badge badge-<?= $diffColors[$t['difficulty']] ?? 'info' ?>"><?= $diffLabels[$t['difficulty']] ?? $t['difficulty'] ?></span>
                 <?php if ($autoUpdate): ?>
                     <span class="badge badge-info" title="Se actualiza automáticamente">🔄 Auto</span>
@@ -128,35 +154,59 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
 </div>
 
 <script>
-// Filtros por plataforma y categoría
-document.querySelectorAll('.tpl-filter').forEach(btn => {
+// Estado de filtros activos
+let activePlatform = 'all';
+let activeCategory = 'all';
+
+function applyFilters() {
+    document.querySelectorAll('.tpl-card').forEach(card => {
+        const platform = card.dataset.platform || '';
+        const category = card.dataset.category || '';
+        const matchPlatform = activePlatform === 'all' || platform === activePlatform;
+        const matchCategory = activeCategory === 'all' || category === activeCategory;
+        card.style.display = (matchPlatform && matchCategory) ? '' : 'none';
+    });
+}
+
+// Filtros por plataforma
+document.querySelectorAll('#platformFilters .tpl-filter').forEach(btn => {
     btn.addEventListener('click', () => {
-        document.querySelectorAll('.tpl-filter').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#platformFilters .tpl-filter').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        const filter = btn.dataset.filter;
-        document.querySelectorAll('.tpl-card').forEach(card => {
-            if (filter === 'all') { card.style.display = ''; return; }
-            const match = card.dataset.platform === filter || card.dataset.category === filter;
-            card.style.display = match ? '' : 'none';
-        });
+        activePlatform = btn.dataset.filter;
+        applyFilters();
+    });
+});
+
+// Filtros por funcionalidad
+document.querySelectorAll('#categoryFilters .tpl-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('#categoryFilters .tpl-filter').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCategory = btn.dataset.filter;
+        applyFilters();
     });
 });
 
 // Buscador
 document.getElementById('templateSearch').addEventListener('input', function() {
     const q = this.value.toLowerCase().trim();
+    if (q) {
+        // Al buscar, resetear filtros visuales
+        document.querySelectorAll('.tpl-filter').forEach(b => b.classList.remove('active'));
+        document.querySelector('#platformFilters .tpl-filter[data-filter="all"]').classList.add('active');
+        document.querySelector('#categoryFilters .tpl-filter[data-filter="all"]').classList.add('active');
+        activePlatform = 'all';
+        activeCategory = 'all';
+    }
     document.querySelectorAll('.tpl-card').forEach(card => {
-        if (!q) { card.style.display = ''; return; }
+        if (!q) { applyFilters(); return; }
         const name = card.dataset.name || '';
         const tags = card.dataset.tags || '';
         const platform = card.dataset.platform || '';
-        const match = name.includes(q) || tags.includes(q) || platform.includes(q);
+        const category = card.dataset.category || '';
+        const match = name.includes(q) || tags.includes(q) || platform.includes(q) || category.includes(q);
         card.style.display = match ? '' : 'none';
     });
-    // Resetear filtro activo
-    if (q) {
-        document.querySelectorAll('.tpl-filter').forEach(b => b.classList.remove('active'));
-        document.querySelector('.tpl-filter[data-filter="all"]').classList.add('active');
-    }
 });
 </script>

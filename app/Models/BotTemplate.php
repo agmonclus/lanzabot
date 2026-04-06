@@ -49,6 +49,14 @@ class BotTemplate
         );
     }
 
+    public static function byPlatformAndCategory(string $platform, string $category): array
+    {
+        return Database::fetchAll(
+            'SELECT * FROM bot_templates WHERE is_active = 1 AND platform = ? AND category = ? ORDER BY sort_order',
+            [$platform, $category]
+        );
+    }
+
     public static function search(string $query): array
     {
         $like = '%' . $query . '%';

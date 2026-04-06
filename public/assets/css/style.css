@@ -624,6 +624,7 @@ textarea.form-control { resize: vertical; }
 }
 .tpl-filter:hover { border-color: var(--accent); color: var(--accent); }
 .tpl-filter.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.badge-category { background: rgba(139,92,246,.15); color: #a78bfa; }
 
 /* Template grid */
 .tpl-grid {

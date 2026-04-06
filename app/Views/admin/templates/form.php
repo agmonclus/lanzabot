@@ -41,14 +41,27 @@ $t           = $template ?? [];
             <div class="form-group" style="flex:1">
                 <label for="platform">Plataforma</label>
                 <select id="platform" name="platform" class="form-control">
-                    <?php foreach (['telegram','discord','multi','other'] as $p): ?>
+                    <?php foreach (['telegram','discord','slack','whatsapp','twitch','matrix','reddit','mastodon','multi','other'] as $p): ?>
                     <option value="<?= $p ?>" <?= ($t['platform'] ?? 'telegram') === $p ? 'selected' : '' ?>><?= ucfirst($p) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="form-group" style="flex:1">
-                <label for="category">Categoría</label>
-                <input type="text" id="category" name="category" class="form-control" value="<?= \App\Core\View::e($t['category'] ?? 'utility') ?>" placeholder="ai, utility, entertainment, moderation, ecommerce">
+                <label for="category">Categoría / Funcionalidad</label>
+                <select id="category" name="category" class="form-control">
+                    <?php
+                    $cats = [
+                        'ai' => 'IA', 'productivity' => 'Productividad', 'commerce' => 'Comercio',
+                        'ecommerce' => 'E-Commerce', 'finance' => 'Finanzas', 'entertainment' => 'Entretenimiento',
+                        'gaming' => 'Gaming', 'moderation' => 'Moderación', 'security' => 'Seguridad',
+                        'social' => 'Social', 'education' => 'Educación', 'marketing' => 'Marketing',
+                        'monitoring' => 'Monitoreo', 'developer' => 'Desarrollo', 'utility' => 'Utilidad',
+                        'starter' => 'Inicio'
+                    ];
+                    foreach ($cats as $val => $label): ?>
+                    <option value="<?= $val ?>" <?= ($t['category'] ?? 'utility') === $val ? 'selected' : '' ?>><?= $label ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             <div class="form-group" style="width:80px">
                 <label for="icon">Icono</label>
