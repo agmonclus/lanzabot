@@ -55,12 +55,9 @@ $platformIcons = [
             <?php endif; ?>
         <?php endif; ?>
 
-        <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/delete"
-              onsubmit="return confirm('¿Eliminar este bot? Esta acción no se puede deshacer.')" style="display:inline">
-            <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
-            <input type="hidden" name="_method" value="DELETE">
-            <button class="btn btn-sm btn-danger">Eliminar</button>
-        </form>
+        <a href="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/delete" class="btn btn-sm btn-danger">
+            Eliminar
+        </a>
     </div>
 </div>
 

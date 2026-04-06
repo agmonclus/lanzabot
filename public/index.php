@@ -43,6 +43,7 @@ $router->get('/bots/from-template/{id}',    'BotController@fromTemplate');
 $router->post('/bots/from-template/{id}',   'BotController@storeFromTemplate');
 $router->get('/bots/check-updates',         'BotController@checkUpdates');
 $router->get('/bots/{id}',                  'BotController@show');
+$router->get('/bots/{id}/delete',           'BotController@confirmDelete');
 $router->post('/bots/{id}/env',             'BotController@saveEnv');
 $router->post('/bots/{id}/deploy',          'BotController@deploy');
 $router->post('/bots/{id}/update',          'BotController@updateBot');

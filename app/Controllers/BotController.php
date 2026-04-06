@@ -293,6 +293,15 @@ class BotController
         View::redirect('/bots/' . $id);
     }
 
+    public function confirmDelete(string $id): void
+    {
+        Auth::require();
+        $user = Auth::user();
+        $bot  = $this->getBot((int) $id, $user['id']);
+
+        View::render('bots/confirm-delete', compact('user', 'bot'));
+    }
+
     public function destroy(string $id): void
     {
         Auth::require();
@@ -300,19 +309,27 @@ class BotController
         $user = Auth::user();
         $bot  = $this->getBot((int) $id, $user['id']);
 
+        // Eliminar aplicación en Coolify (sin borrar volúmenes ni BBDDs externas)
         if ($bot['coolify_app_uuid']) {
             CoolifyAPI::deleteApplication($bot['coolify_app_uuid']);
         }
 
-        // Remove uploaded files
+        // Eliminar archivos de código subidos por el usuario
         $dir = UPLOAD_PATH . '/' . $user['id'] . '/' . $bot['id'];
         if (is_dir($dir)) {
-            array_map('unlink', glob($dir . '/*'));
+            $files = glob($dir . '/*') ?: [];
+            foreach ($files as $file) {
+                if (is_file($file)) {
+                    unlink($file);
+                }
+            }
             rmdir($dir);
         }
 
+        // Borrar registro de la BD (env_vars incluidas al estar en la misma fila)
         Bot::delete($bot['id']);
-        Auth::flash('success', 'Bot eliminado.');
+
+        Auth::flash('success', 'Bot «' . $bot['name'] . '» eliminado correctamente.');
         View::redirect('/dashboard');
     }
 
