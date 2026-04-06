@@ -25,6 +25,11 @@ define('DISCORD_REDIRECT_URI',  $_ENV['DISCORD_REDIRECT_URI'] ?? '');
 define('TELEGRAM_BOT_TOKEN',    $_ENV['TELEGRAM_BOT_TOKEN'] ?? '');
 define('TELEGRAM_BOT_USERNAME', $_ENV['TELEGRAM_BOT_USERNAME'] ?? '');
 
+// Proveedores de login OAuth habilitados (true/false)
+define('LOGIN_GOOGLE_ENABLED',   filter_var($_ENV['LOGIN_GOOGLE_ENABLED']   ?? 'false', FILTER_VALIDATE_BOOLEAN));
+define('LOGIN_DISCORD_ENABLED',  filter_var($_ENV['LOGIN_DISCORD_ENABLED']  ?? 'false', FILTER_VALIDATE_BOOLEAN));
+define('LOGIN_TELEGRAM_ENABLED', filter_var($_ENV['LOGIN_TELEGRAM_ENABLED'] ?? 'false', FILTER_VALIDATE_BOOLEAN));
+
 define('STRIPE_PUBLIC_KEY',      $_ENV['STRIPE_PUBLIC_KEY'] ?? '');
 define('STRIPE_SECRET_KEY',      $_ENV['STRIPE_SECRET_KEY'] ?? '');
 define('STRIPE_WEBHOOK_SECRET',  $_ENV['STRIPE_WEBHOOK_SECRET'] ?? '');

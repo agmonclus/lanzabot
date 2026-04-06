@@ -74,6 +74,39 @@ $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanza
                         <?= \App\Core\View::e($label) ?>
                         <?php if ($isReq): ?><span class="required">*</span><?php endif; ?>
                     </label>
+                    <?php if (in_array(strtoupper($key), ['TIMEZONE', 'TZ', 'BOT_TIMEZONE', 'APP_TIMEZONE'])): ?>
+                        <?php
+                            $tzSelected = $default ?: ($placeholder ?: 'Europe/Madrid');
+                            $tzRegions  = [
+                                'Africa'     => \DateTimeZone::AFRICA,
+                                'América'    => \DateTimeZone::AMERICA,
+                                'Antártica'  => \DateTimeZone::ANTARCTICA,
+                                'Ártico'     => \DateTimeZone::ARCTIC,
+                                'Asia'       => \DateTimeZone::ASIA,
+                                'Atlántico'  => \DateTimeZone::ATLANTIC,
+                                'Australia'  => \DateTimeZone::AUSTRALIA,
+                                'Europa'     => \DateTimeZone::EUROPE,
+                                'Índico'     => \DateTimeZone::INDIAN,
+                                'Pacífico'   => \DateTimeZone::PACIFIC,
+                                'UTC'        => \DateTimeZone::UTC,
+                            ];
+                        ?>
+                        <select id="env_<?= \App\Core\View::e($key) ?>"
+                                name="env_<?= \App\Core\View::e($key) ?>"
+                                class="form-control"
+                                <?= $isReq ? 'required' : '' ?>>
+                            <option value="">— Selecciona zona horaria —</option>
+                            <?php foreach ($tzRegions as $regionLabel => $regionMask): ?>
+                                <optgroup label="<?= $regionLabel ?>">
+                                    <?php foreach (\DateTimeZone::listIdentifiers($regionMask) as $tz): ?>
+                                        <option value="<?= $tz ?>" <?= $tz === $tzSelected ? 'selected' : '' ?>>
+                                            <?= $tz ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </optgroup>
+                            <?php endforeach; ?>
+                        </select>
+                    <?php else: ?>
                     <input type="text"
                            id="env_<?= \App\Core\View::e($key) ?>"
                            name="env_<?= \App\Core\View::e($key) ?>"
@@ -81,6 +114,7 @@ $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanza
                            placeholder="<?= \App\Core\View::e($placeholder) ?>"
                            value="<?= \App\Core\View::e($default) ?>"
                            <?= $isReq ? 'required' : '' ?>>
+                    <?php endif; ?>
                     <small class="form-hint"><code><?= \App\Core\View::e($key) ?></code></small>
                 </div>
                 <?php endforeach; ?>
