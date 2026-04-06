@@ -91,10 +91,19 @@ $platformIcons = ['telegram' => '✈️', 'discord' => '🎮', 'multi' => '🌐'
             🔧 Ir al panel del bot
         </a>
         <a href="<?= APP_URL ?>/bots/create" class="btn btn-outline">
-            ➕ Crear otro bot
+            ➕ Instalar otro bot
         </a>
         <a href="<?= APP_URL ?>/dashboard" class="btn btn-ghost">
             ← Dashboard
         </a>
     </div>
+
+    <?php if ($deployed && !empty($template['auto_update_supported'])): ?>
+    <div style="text-align:center; margin-top:1rem; padding:1rem; background:var(--accent-lt); border-radius:var(--radius);">
+        <p style="margin:0; font-size:.88rem;">
+            🔄 <strong>Auto-actualización activada.</strong> Tu bot se actualizará automáticamente cuando publiquemos mejoras.
+            Puedes gestionar esto desde el <a href="<?= APP_URL ?>/bots/<?= $bot['id'] ?>">panel del bot</a>.
+        </p>
+    </div>
+    <?php endif; ?>
 </div>

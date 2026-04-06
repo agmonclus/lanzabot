@@ -1,4 +1,11 @@
-<?php $pageTitle = 'Dashboard'; ?>
+<?php
+$pageTitle = 'Dashboard';
+$platformIcons = [
+    'telegram' => '✈️', 'discord' => '🎮', 'slack' => '💬', 'whatsapp' => '📱',
+    'twitch' => '🎮', 'matrix' => '🟢', 'reddit' => '🔶', 'mastodon' => '🐘',
+    'multi' => '🌐', 'other' => '⚙️'
+];
+?>
 <div class="page-header">
     <div>
         <h1>Dashboard</h1>
@@ -45,7 +52,7 @@
         <?php foreach ($bots as $bot): ?>
         <a href="<?= APP_URL ?>/bots/<?= $bot['id'] ?>" class="bot-card">
             <div class="bot-card-header">
-                <span class="bot-platform <?= $bot['platform'] ?>"><?= $bot['platform'] === 'telegram' ? '✈️' : '🎮' ?></span>
+                <span class="bot-platform <?= $bot['platform'] ?>"><?= $platformIcons[$bot['platform']] ?? '🤖' ?></span>
                 <span class="bot-status status-<?= \App\Core\View::e($bot['coolify_status'] ?? 'stopped') ?>">
                     <?= \App\Core\View::e($bot['coolify_status'] ?? 'stopped') ?>
                 </span>

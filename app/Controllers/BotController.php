@@ -121,12 +121,14 @@ class BotController
 
         // Crear bot en BD
         $botId = Bot::create([
-            'user_id'      => $user['id'],
-            'name'         => $botName,
-            'platform'     => $template['platform'],
-            'description'  => $template['short_description'],
-            'docker_image' => $template['docker_image'],
-            'template_id'  => $template['id'],
+            'user_id'         => $user['id'],
+            'name'            => $botName,
+            'platform'        => $template['platform'],
+            'description'     => $template['short_description'],
+            'docker_image'    => $template['docker_image'],
+            'template_id'     => $template['id'],
+            'auto_update'     => 1,
+            'current_version' => $template['version'] ?? '1.0.0',
         ]);
 
         // Guardar env vars
@@ -167,42 +169,6 @@ class BotController
         ));
     }
 
-    public function store(): void
-    {
-        Auth::require();
-        $this->verifyCsrf();
-
-        $user = Auth::user();
-        $plan = Auth::plan();
-
-        $name     = trim($_POST['name']     ?? '');
-        $platform = $_POST['platform']      ?? 'telegram';
-        $desc     = trim($_POST['description'] ?? '');
-        $image    = trim($_POST['docker_image'] ?? 'python:3.11-slim');
-
-        if (!$name) {
-            Auth::flash('error', 'El nombre del bot es obligatorio.');
-            View::redirect('/bots/create');
-        }
-
-        $botCount = Bot::countForUser($user['id']);
-        if ($plan['max_bots'] > 0 && $botCount >= $plan['max_bots']) {
-            Auth::flash('error', 'Límite de bots alcanzado.');
-            View::redirect('/dashboard');
-        }
-
-        $botId = Bot::create([
-            'user_id'      => $user['id'],
-            'name'         => $name,
-            'platform'     => $platform,
-            'description'  => $desc,
-            'docker_image' => $image,
-        ]);
-
-        Auth::flash('success', 'Bot creado. Ahora sube tu código y configura las variables de entorno.');
-        View::redirect('/bots/' . $botId);
-    }
-
     public function show(string $id): void
     {
         Auth::require();
@@ -210,44 +176,6 @@ class BotController
         $bot  = $this->getBot((int) $id, $user['id']);
 
         View::render('bots/show', compact('user', 'bot'));
-    }
-
-    public function upload(string $id): void
-    {
-        Auth::require();
-        $this->verifyCsrf();
-
-        $user = Auth::user();
-        $bot  = $this->getBot((int) $id, $user['id']);
-
-        if (empty($_FILES['code']) || $_FILES['code']['error'] !== UPLOAD_ERR_OK) {
-            Auth::flash('error', 'Error al subir el archivo.');
-            View::redirect('/bots/' . $id);
-        }
-
-        $file     = $_FILES['code'];
-        $ext      = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $allowed  = ['zip', 'tar', 'gz'];
-
-        if (!in_array($ext, $allowed)) {
-            Auth::flash('error', 'Solo se permiten archivos .zip, .tar o .tar.gz.');
-            View::redirect('/bots/' . $id);
-        }
-
-        if ($file['size'] > MAX_UPLOAD_SIZE) {
-            Auth::flash('error', 'El archivo supera el límite de 50 MB.');
-            View::redirect('/bots/' . $id);
-        }
-
-        $dir  = UPLOAD_PATH . '/' . $user['id'] . '/' . $bot['id'];
-        if (!is_dir($dir)) mkdir($dir, 0750, true);
-
-        $dest = $dir . '/code.' . $ext;
-        move_uploaded_file($file['tmp_name'], $dest);
-
-        Bot::update($bot['id'], ['code_uploaded' => 1, 'code_path' => $dest]);
-        Auth::flash('success', 'Código subido correctamente.');
-        View::redirect('/bots/' . $id);
     }
 
     public function saveEnv(string $id): void
@@ -423,6 +351,97 @@ class BotController
             'status' => $result['status'] ?? $bot['coolify_status'],
             'data'   => $result,
         ]);
+    }
+
+    public function toggleAutoUpdate(string $id): void
+    {
+        Auth::require();
+        $this->verifyCsrf();
+        $user = Auth::user();
+        $bot  = $this->getBot((int) $id, $user['id']);
+
+        $newValue = $bot['auto_update'] ? 0 : 1;
+        Bot::update($bot['id'], ['auto_update' => $newValue]);
+        Auth::flash('success', $newValue ? 'Auto-actualización activada.' : 'Auto-actualización desactivada.');
+        View::redirect('/bots/' . $id);
+    }
+
+    public function updateBot(string $id): void
+    {
+        Auth::require();
+        $this->verifyCsrf();
+        $user = Auth::user();
+        $plan = Auth::plan();
+        $bot  = $this->getBot((int) $id, $user['id']);
+
+        if (!$bot['template_id']) {
+            Auth::flash('error', 'Este bot no está vinculado a una plantilla.');
+            View::redirect('/bots/' . $id);
+            return;
+        }
+
+        $template = BotTemplate::find($bot['template_id']);
+        if (!$template) {
+            Auth::flash('error', 'Plantilla no encontrada.');
+            View::redirect('/bots/' . $id);
+            return;
+        }
+
+        // Verificar si hay actualización disponible
+        if (version_compare($template['version'] ?? '1.0.0', $bot['current_version'] ?? '1.0.0', '<=')) {
+            Auth::flash('info', 'Tu bot ya tiene la última versión.');
+            View::redirect('/bots/' . $id);
+            return;
+        }
+
+        try {
+            if ($bot['coolify_app_uuid']) {
+                // Actualizar imagen Docker si cambió
+                if ($bot['docker_image'] !== $template['docker_image']) {
+                    Bot::update($bot['id'], ['docker_image' => $template['docker_image']]);
+                }
+
+                // Re-desplegar con la nueva versión
+                CoolifyAPI::deploy($bot['coolify_app_uuid']);
+                Bot::update($bot['id'], [
+                    'current_version'  => $template['version'],
+                    'last_updated_at'  => date('Y-m-d H:i:s'),
+                    'coolify_status'   => 'running',
+                ]);
+                Auth::flash('success', 'Bot actualizado a la versión ' . $template['version'] . '.');
+            } else {
+                Auth::flash('error', 'El bot no está desplegado aún.');
+            }
+        } catch (\Exception $e) {
+            Auth::flash('error', 'Error al actualizar: ' . $e->getMessage());
+        }
+
+        View::redirect('/bots/' . $id);
+    }
+
+    public function checkUpdates(): void
+    {
+        Auth::require();
+        $user = Auth::user();
+
+        $bots = Bot::forUser($user['id']);
+        $updates = [];
+        foreach ($bots as $bot) {
+            if (!$bot['template_id']) continue;
+            $template = BotTemplate::find($bot['template_id']);
+            if (!$template) continue;
+            if (version_compare($template['version'] ?? '1.0.0', $bot['current_version'] ?? '1.0.0', '>')) {
+                $updates[] = [
+                    'bot_id'          => $bot['id'],
+                    'bot_name'        => $bot['name'],
+                    'current_version' => $bot['current_version'] ?? '1.0.0',
+                    'new_version'     => $template['version'],
+                    'auto_update'     => (bool)$bot['auto_update'],
+                ];
+            }
+        }
+
+        View::json(['updates' => $updates, 'count' => count($updates)]);
     }
 
     // ---- Helpers ----

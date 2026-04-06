@@ -772,4 +772,73 @@ textarea.form-control { resize: vertical; }
     .setup-tpl-header { flex-direction: column; }
     .deployed-actions { flex-direction: column; }
     .deployed-actions .btn { width: 100%; text-align: center; }
+    .help-steps-grid { grid-template-columns: 1fr; }
+    .help-platform-grid { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   Help pages
+   ============================================================ */
+.help-steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 1rem; }
+.help-step-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 1.5rem; text-align: center; position: relative;
+}
+.help-step-number {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1rem; margin-bottom: .75rem;
+}
+.help-step-card h3 { font-size: .95rem; margin-bottom: .5rem; }
+.help-step-card p { font-size: .85rem; color: var(--muted); line-height: 1.5; }
+
+.help-faq { display: flex; flex-direction: column; gap: .5rem; }
+.faq-item {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden;
+}
+.faq-item summary {
+    padding: .85rem 1rem; cursor: pointer; font-weight: 600; font-size: .92rem;
+    list-style: none; display: flex; align-items: center; justify-content: space-between;
+}
+.faq-item summary::after { content: '+'; font-size: 1.2rem; color: var(--muted); transition: transform .2s; }
+.faq-item[open] summary::after { content: '−'; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item p { padding: 0 1rem 1rem; font-size: .88rem; color: var(--muted); line-height: 1.6; }
+.faq-item p a { color: var(--accent); }
+
+.help-platform-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem; }
+.help-platform-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 1.25rem; display: flex; flex-direction: column; gap: .75rem;
+}
+.help-platform-header { display: flex; align-items: center; gap: .75rem; }
+.help-platform-icon { font-size: 1.8rem; }
+.help-platform-header h3 { font-size: .95rem; margin: 0; }
+.help-platform-guide { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+.help-platform-guide ol { padding-left: 1.25rem; }
+.help-platform-guide ol li { margin-bottom: .25rem; }
+.help-platform-guide a { color: var(--accent); }
+.help-platform-bots {
+    display: flex; flex-wrap: wrap; gap: .5rem; align-items: center;
+    padding-top: .5rem; border-top: 1px solid var(--border); font-size: .82rem;
+}
+.help-platform-bots strong { font-size: .8rem; color: var(--muted); }
+.help-bot-link {
+    display: inline-flex; align-items: center; gap: .25rem;
+    padding: .2rem .5rem; background: var(--accent-lt); border-radius: 4px;
+    font-size: .8rem; color: var(--accent); white-space: nowrap;
+}
+.help-bot-link:hover { background: var(--accent); color: #fff; text-decoration: none; }
+
+/* Additional platform badges */
+.badge-slack { background: #4A154B22; color: #4A154B; }
+.badge-whatsapp { background: #25D36622; color: #128C7E; }
+.badge-twitch { background: #9146FF22; color: #9146FF; }
+.badge-matrix { background: #0DBD8B22; color: #0DBD8B; }
+.badge-reddit { background: #FF450022; color: #FF4500; }
+.badge-mastodon { background: #6364FF22; color: #6364FF; }
+
+/* Search in catalog */
+.tpl-search input { border: 1px solid var(--border); padding: .6rem .85rem; border-radius: var(--radius); font-size: .88rem; width: 100%; }
+.tpl-search input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(13,110,253,.15); }

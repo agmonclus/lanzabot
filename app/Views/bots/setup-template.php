@@ -1,6 +1,10 @@
 <?php
 $pageTitle = 'Configurar ' . \App\Core\View::e($template['name']);
-$platformIcons = ['telegram' => '✈️', 'discord' => '🎮', 'multi' => '🌐', 'other' => '⚙️'];
+$platformIcons = [
+    'telegram' => '✈️', 'discord' => '🎮', 'slack' => '💬', 'whatsapp' => '📱',
+    'twitch' => '🎮', 'matrix' => '🟢', 'reddit' => '🔶', 'mastodon' => '🐘',
+    'multi' => '🌐', 'other' => '⚙️'
+];
 $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanzado'];
 ?>
 
@@ -23,6 +27,10 @@ $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanza
                         <?= $platformIcons[$template['platform']] ?? '⚙️' ?> <?= ucfirst($template['platform']) ?>
                     </span>
                     <span class="badge badge-info"><?= $diffLabels[$template['difficulty']] ?? $template['difficulty'] ?></span>
+                    <span class="badge badge-info">v<?= \App\Core\View::e($template['version'] ?? '1.0.0') ?></span>
+                    <?php if (!empty($template['auto_update_supported'])): ?>
+                        <span class="badge badge-success">🔄 Auto-actualizable</span>
+                    <?php endif; ?>
                     <span class="text-muted"><?= $template['install_count'] ?> instalaciones</span>
                 </div>
             </div>
@@ -82,10 +90,16 @@ $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanza
                 </div>
             <?php endif; ?>
 
+            <?php if (!empty($template['auto_update_supported'])): ?>
+            <div class="alert alert-info" style="margin-top:1rem">
+                🔄 <strong>Auto-actualización:</strong> Este bot se mantendrá actualizado automáticamente cuando publiquemos mejoras. Podrás desactivarlo después.
+            </div>
+            <?php endif; ?>
+
             <div class="form-actions" style="margin-top:1.5rem">
                 <a href="<?= APP_URL ?>/bots/create" class="btn btn-ghost">Cancelar</a>
                 <button type="submit" class="btn btn-primary btn-lg">
-                    🚀 Desplegar bot
+                    🚀 Instalar bot
                 </button>
             </div>
         </form>

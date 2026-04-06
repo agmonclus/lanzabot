@@ -4,15 +4,36 @@ $isDeployed = !empty($bot['coolify_app_uuid']);
 $envVars = \App\Models\Bot::getEnvVars($bot['id']);
 $envText = '';
 foreach ($envVars as $k => $v) $envText .= "{$k}={$v}\n";
+
+$template = null;
+$hasUpdate = false;
+if (!empty($bot['template_id'])) {
+    $template = \App\Models\BotTemplate::find($bot['template_id']);
+    if ($template) {
+        $hasUpdate = version_compare($template['version'] ?? '1.0.0', $bot['current_version'] ?? '1.0.0', '>');
+    }
+}
+
+$platformIcons = [
+    'telegram' => '✈️', 'discord' => '🎮', 'slack' => '💬', 'whatsapp' => '📱',
+    'twitch' => '🎮', 'matrix' => '🟢', 'reddit' => '🔶', 'mastodon' => '🐘',
+    'multi' => '🌐', 'other' => '⚙️'
+];
 ?>
 
 <div class="page-header">
     <div>
         <a href="<?= APP_URL ?>/dashboard" class="breadcrumb">← Dashboard</a>
-        <h1><?= \App\Core\View::e($bot['name']) ?></h1>
+        <h1>
+            <?= $platformIcons[$bot['platform']] ?? '🤖' ?>
+            <?= \App\Core\View::e($bot['name']) ?>
+        </h1>
         <span class="bot-status status-<?= \App\Core\View::e($bot['coolify_status'] ?? 'stopped') ?>">
             <?= \App\Core\View::e($bot['coolify_status'] ?? 'stopped') ?>
         </span>
+        <?php if ($template): ?>
+            <span class="badge badge-info" style="margin-left:.5rem">v<?= \App\Core\View::e($bot['current_version'] ?? '1.0.0') ?></span>
+        <?php endif; ?>
     </div>
 
     <div class="bot-actions">
@@ -43,46 +64,56 @@ foreach ($envVars as $k => $v) $envText .= "{$k}={$v}\n";
     </div>
 </div>
 
+<?php if ($hasUpdate): ?>
+<div class="flash flash-info" style="display:flex; align-items:center; justify-content:space-between;">
+    <span>
+        🔄 <strong>Actualización disponible:</strong> v<?= \App\Core\View::e($bot['current_version'] ?? '1.0.0') ?> → v<?= \App\Core\View::e($template['version']) ?>
+        <?php if (!empty($template['changelog'])): ?>
+            <br><small><?= \App\Core\View::e($template['changelog']) ?></small>
+        <?php endif; ?>
+    </span>
+    <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/update" style="display:inline; margin-left:1rem;">
+        <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
+        <button class="btn btn-sm btn-primary">Actualizar ahora</button>
+    </form>
+</div>
+<?php endif; ?>
+
 <div class="bot-layout">
-    <!-- Left column: code + env -->
+    <!-- Left column -->
     <div class="bot-main">
 
-        <!-- Upload code -->
+        <!-- Info de plantilla -->
+        <?php if ($template): ?>
         <div class="card">
             <div class="card-header">
-                <h3>Código</h3>
-                <?php if ($bot['code_uploaded']): ?>
-                    <span class="badge badge-success">Subido ✓</span>
-                <?php endif; ?>
+                <h3><?= $template['icon'] ?> Plantilla</h3>
+                <span class="badge badge-platform badge-<?= $template['platform'] ?>"><?= ucfirst($template['platform']) ?></span>
             </div>
             <div class="card-body">
-                <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/upload" enctype="multipart/form-data">
-                    <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
-                    <div class="upload-zone" id="uploadZone">
-                        <input type="file" id="codeFile" name="code" accept=".zip,.tar,.gz" style="display:none">
-                        <label for="codeFile" class="upload-label">
-                            <span class="upload-icon">📦</span>
-                            <span>Arrastra tu archivo o <strong>haz clic</strong> para seleccionar</span>
-                            <small>.zip / .tar.gz — máx. 50 MB</small>
-                        </label>
-                        <div id="selectedFile" style="display:none" class="selected-file"></div>
-                    </div>
-                    <button type="submit" class="btn btn-sm btn-outline mt-2" id="uploadBtn" style="display:none">Subir código</button>
-                </form>
+                <p style="margin:0 0 .75rem"><?= \App\Core\View::e($template['short_description']) ?></p>
+                <div style="display:flex; gap:1rem; flex-wrap:wrap; font-size:.85rem; color:var(--text-muted);">
+                    <span>📦 <?= \App\Core\View::e($bot['docker_image']) ?></span>
+                    <span>📊 <?= $template['install_count'] ?> instalaciones</span>
+                    <?php if (!empty($template['documentation_url'])): ?>
+                        <a href="<?= \App\Core\View::e($template['documentation_url']) ?>" target="_blank" rel="noopener">📖 Documentación</a>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
+        <?php endif; ?>
 
         <!-- Variables de entorno -->
         <div class="card">
             <div class="card-header">
-                <h3>Variables de entorno</h3>
+                <h3>🔑 Variables de entorno</h3>
             </div>
             <div class="card-body">
                 <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/env">
                     <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
                     <textarea name="env_vars" class="form-control code-editor" rows="8"
                         placeholder="BOT_TOKEN=tu_token&#10;OTRA_VAR=valor"><?= \App\Core\View::e(trim($envText)) ?></textarea>
-                    <small class="form-hint">Una variable por línea en formato CLAVE=VALOR</small>
+                    <small class="form-hint">Una variable por línea en formato CLAVE=VALOR. Los cambios se aplicarán automáticamente al bot en ejecución.</small>
                     <div class="form-actions mt-2">
                         <button type="submit" class="btn btn-sm btn-outline">Guardar variables</button>
                     </div>
@@ -90,20 +121,52 @@ foreach ($envVars as $k => $v) $envText .= "{$k}={$v}\n";
             </div>
         </div>
 
-        <!-- Deploy -->
+        <!-- Auto-actualización -->
+        <?php if ($template && !empty($template['auto_update_supported'])): ?>
         <div class="card">
-            <div class="card-header"><h3>Despliegue</h3></div>
+            <div class="card-header">
+                <h3>🔄 Auto-actualización</h3>
+            </div>
             <div class="card-body">
-                <?php if (!$bot['code_uploaded'] && !$isDeployed): ?>
-                    <p class="text-muted">Sube tu código antes de desplegar.</p>
-                <?php else: ?>
-                    <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/deploy">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div>
+                        <p style="margin:0 0 .25rem">
+                            <?php if ($bot['auto_update']): ?>
+                                <span class="badge badge-success">Activada</span>
+                            <?php else: ?>
+                                <span class="badge badge-warning">Desactivada</span>
+                            <?php endif; ?>
+                        </p>
+                        <small class="text-muted">
+                            Cuando hay una nueva versión de la plantilla, tu bot se actualizará automáticamente.
+                            Versión actual: <strong>v<?= \App\Core\View::e($bot['current_version'] ?? '1.0.0') ?></strong>
+                            <?php if (!empty($bot['last_updated_at'])): ?>
+                                · Última actualización: <?= date('d/m/Y H:i', strtotime($bot['last_updated_at'])) ?>
+                            <?php endif; ?>
+                        </small>
+                    </div>
+                    <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/auto-update">
                         <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
-                        <button type="submit" class="btn btn-primary">
-                            <?= $isDeployed ? '🚀 Re-desplegar' : '🚀 Desplegar ahora' ?>
+                        <button class="btn btn-sm <?= $bot['auto_update'] ? 'btn-outline' : 'btn-primary' ?>">
+                            <?= $bot['auto_update'] ? 'Desactivar' : 'Activar' ?>
                         </button>
                     </form>
-                <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- Deploy manual -->
+        <div class="card">
+            <div class="card-header"><h3>🚀 Despliegue</h3></div>
+            <div class="card-body">
+                <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/deploy">
+                    <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
+                    <button type="submit" class="btn btn-primary">
+                        <?= $isDeployed ? '🚀 Re-desplegar' : '🚀 Desplegar ahora' ?>
+                    </button>
+                    <small class="form-hint" style="display:block; margin-top:.5rem">Re-despliega el bot con la configuración actual.</small>
+                </form>
             </div>
         </div>
     </div>
@@ -123,11 +186,28 @@ foreach ($envVars as $k => $v) $envText .= "{$k}={$v}\n";
                 <?php if ($isDeployed): ?>
                     <div class="stat-row"><span>UUID</span><code><?= substr($bot['coolify_app_uuid'], 0, 8) ?>...</code></div>
                     <div class="stat-row"><span>Estado</span><span id="botStatus" class="bot-status status-<?= \App\Core\View::e($bot['coolify_status']) ?>"><?= \App\Core\View::e($bot['coolify_status']) ?></span></div>
+                    <div class="stat-row"><span>Plataforma</span><span><?= $platformIcons[$bot['platform']] ?? '⚙️' ?> <?= ucfirst($bot['platform']) ?></span></div>
+                    <?php if ($template): ?>
+                    <div class="stat-row"><span>Versión</span><span>v<?= \App\Core\View::e($bot['current_version'] ?? '1.0.0') ?></span></div>
+                    <div class="stat-row"><span>Auto-update</span><span><?= $bot['auto_update'] ? '✅ Sí' : '❌ No' ?></span></div>
+                    <?php endif; ?>
                 <?php else: ?>
                     <p class="text-muted">Bot no desplegado aún.</p>
                 <?php endif; ?>
             </div>
         </div>
+
+        <!-- Ayuda rápida -->
+        <?php if ($template && !empty($template['setup_instructions'])): ?>
+        <div class="card">
+            <div class="card-header"><h3>📋 Guía rápida</h3></div>
+            <div class="card-body">
+                <div class="setup-steps" style="font-size:.85rem">
+                    <?= nl2br(\App\Core\View::e($template['setup_instructions'])) ?>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <!-- Logs -->
         <?php if ($isDeployed): ?>

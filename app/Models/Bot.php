@@ -33,14 +33,16 @@ class Bot
     public static function create(array $data): int
     {
         return Database::insert(
-            'INSERT INTO bots (user_id, name, platform, description, docker_image, template_id) VALUES (?, ?, ?, ?, ?, ?)',
+            'INSERT INTO bots (user_id, name, platform, description, docker_image, template_id, auto_update, current_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $data['user_id'],
                 $data['name'],
-                $data['platform']     ?? 'telegram',
-                $data['description']  ?? '',
-                $data['docker_image'] ?? 'python:3.11-slim',
-                $data['template_id']  ?? null,
+                $data['platform']        ?? 'telegram',
+                $data['description']     ?? '',
+                $data['docker_image']    ?? 'python:3.11-slim',
+                $data['template_id']     ?? null,
+                $data['auto_update']     ?? 1,
+                $data['current_version'] ?? '1.0.0',
             ]
         );
     }
@@ -75,5 +77,18 @@ class Bot
         $bot = self::find($id);
         if (!$bot || !$bot['env_vars']) return [];
         return json_decode($bot['env_vars'], true) ?? [];
+    }
+
+    public static function findAutoUpdatable(): array
+    {
+        return Database::fetchAll(
+            'SELECT b.*, bt.version AS template_version, bt.docker_image AS template_docker_image
+             FROM bots b
+             JOIN bot_templates bt ON bt.id = b.template_id
+             WHERE b.auto_update = 1
+               AND b.coolify_app_uuid IS NOT NULL
+               AND bt.auto_update_supported = 1
+               AND bt.version > b.current_version'
+        );
     }
 }

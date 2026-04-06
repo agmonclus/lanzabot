@@ -41,11 +41,12 @@ $router->get('/dashboard', 'DashboardController@index');
 $router->get('/bots/create',                'BotController@create');
 $router->get('/bots/from-template/{id}',    'BotController@fromTemplate');
 $router->post('/bots/from-template/{id}',   'BotController@storeFromTemplate');
-$router->post('/bots',                      'BotController@store');
+$router->get('/bots/check-updates',         'BotController@checkUpdates');
 $router->get('/bots/{id}',                  'BotController@show');
-$router->post('/bots/{id}/upload',          'BotController@upload');
 $router->post('/bots/{id}/env',             'BotController@saveEnv');
 $router->post('/bots/{id}/deploy',          'BotController@deploy');
+$router->post('/bots/{id}/update',          'BotController@updateBot');
+$router->post('/bots/{id}/auto-update',     'BotController@toggleAutoUpdate');
 $router->post('/bots/{id}/start',           'BotController@start');
 $router->post('/bots/{id}/stop',            'BotController@stop');
 $router->post('/bots/{id}/restart',         'BotController@restart');
@@ -62,6 +63,10 @@ $router->post('/plans/custom',      'PlanController@customRequest');
 $router->get('/billing',         'BillingController@index');
 $router->get('/billing/portal',  'BillingController@portal');
 $router->post('/stripe/webhook', 'BillingController@webhook');
+
+// Help
+$router->get('/help',              'HelpController@index');
+$router->get('/help/guide/{slug}', 'HelpController@guide');
 
 // Admin
 $router->get('/admin',                          'AdminController@index');

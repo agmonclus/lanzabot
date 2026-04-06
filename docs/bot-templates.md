@@ -1,8 +1,174 @@
-# Plantillas de Bots — Documentación
+# Bot Templates — Lanzabot
 
-## ¿Qué son las plantillas de bots?
+## Modelo auto-instalable y auto-actualizable
 
-Las **plantillas de bots** son configuraciones prefabricadas que permiten a los usuarios desplegar bots open source populares con **un solo clic**. Cada plantilla incluye:
+Lanzabot funciona con un modelo de **bots auto-instalables**. El usuario:
+
+1. Elige un bot del catálogo
+2. Introduce sus claves API (token del bot, API keys, etc.)
+3. Hace clic en "Instalar" → el bot se despliega automáticamente
+4. El bot se **auto-actualiza** cuando publicamos mejoras
+
+**No se sube código manualmente.** Todo el código viene de plantillas pre-configuradas.
+
+---
+
+## Plataformas soportadas
+
+| Plataforma | Slug BD | Icono |
+|-----------|---------|-------|
+| Telegram | `telegram` | ✈️ |
+| Discord | `discord` | 🎮 |
+| Slack | `slack` | 💬 |
+| WhatsApp | `whatsapp` | 📱 |
+| Twitch | `twitch` | 🎮 |
+| Matrix/Element | `matrix` | 🟢 |
+| Reddit | `reddit` | 🔶 |
+| Mastodon | `mastodon` | 🐘 |
+| Multi-plataforma | `multi` | 🌐 |
+| Otro | `other` | ⚙️ |
+
+---
+
+## Catálogo de plantillas (22 bots)
+
+### Telegram (6)
+1. **Telegram Echo Bot** — Bot básico que repite mensajes. Gratis. Fácil.
+2. **Telegram AI Chat (GPT)** — Asistente IA con ChatGPT. Starter. Fácil.
+3. **Telegram Tienda Bot** — Tienda online en Telegram. Starter. Medio.
+4. **Bot Generador de Imágenes IA** — Genera imágenes con DALL-E. Starter. Fácil.
+5. **Telegram RSS Feed Bot** — Monitorea feeds RSS. Gratis. Medio.
+6. **Telegram Recordatorios Bot** — Programa recordatorios. Gratis. Fácil.
+
+### Discord (5)
+7. **Discord Music Bot** — Reproduce música. Starter. Fácil.
+8. **Discord Moderación Bot** — Modera servidores. Starter. Medio.
+9. **Discord Bienvenida Bot** — Bienvenidas y roles. Gratis. Fácil.
+10. **Discord Tickets / Soporte Bot** — Sistema de tickets. Starter. Medio.
+11. **Discord Sistema de Niveles** — XP y leaderboard. Starter. Fácil.
+
+### Slack (1)
+12. **Slack Notificaciones Bot** — Centraliza alertas. Gratis. Fácil.
+
+### WhatsApp (1)
+13. **WhatsApp Business Bot** — Atención al cliente. Starter. Medio.
+
+### Twitch (1)
+14. **Twitch Chat Bot** — Modera chat de streams. Gratis. Fácil.
+
+### Reddit (1)
+15. **Reddit Moderación Bot** — Modera subreddits. Starter. Medio.
+
+### Mastodon (1)
+16. **Mastodon Auto-poster** — Publica en Fediverso. Gratis. Fácil.
+
+### Matrix (1)
+17. **Matrix/Element Bot** — Bot para salas Matrix. Gratis. Medio.
+
+### Multi-plataforma (4)
+18. **Asistente IA Multi-plataforma** — IA en Telegram+Discord. Medium. Avanzado.
+19. **Monitor de Uptime** — Monitorea disponibilidad web. Gratis. Fácil.
+20. **Web Scraper + Notificador** — Rastrea cambios en webs. Starter. Medio.
+21. **Webhook Relay / API Gateway** — Reenvía webhooks. Gratis. Medio.
+22. **Programador de Tareas (Cron)** — Cron jobs en la nube. Gratis. Medio.
+
+---
+
+## Schema de bot_templates
+
+```sql
+CREATE TABLE bot_templates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    slug VARCHAR(80) UNIQUE NOT NULL,
+    name VARCHAR(150) NOT NULL,
+    description TEXT NOT NULL,
+    short_description VARCHAR(255),
+    platform ENUM('telegram','discord','slack','whatsapp','twitch','matrix','reddit','mastodon','multi','other'),
+    category VARCHAR(50) DEFAULT 'utility',
+    icon VARCHAR(10) DEFAULT '🤖',
+    docker_image VARCHAR(255) DEFAULT 'python:3.11-slim',
+    git_repo_url VARCHAR(500) NULL,
+    default_env_vars JSON,
+    required_env_vars JSON,
+    ram_mb_min INT DEFAULT 128,
+    min_plan_slug VARCHAR(50) DEFAULT 'free',
+    difficulty ENUM('easy','medium','advanced') DEFAULT 'easy',
+    tags VARCHAR(500),
+    documentation_url VARCHAR(500) NULL,
+    setup_instructions TEXT NULL,
+    is_featured TINYINT(1) DEFAULT 0,
+    is_active TINYINT(1) DEFAULT 1,
+    install_count INT UNSIGNED DEFAULT 0,
+    auto_update_supported TINYINT(1) DEFAULT 1,
+    version VARCHAR(20) DEFAULT '1.0.0',
+    changelog TEXT NULL,
+    sort_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
+## Schema de bots (campos de auto-install)
+
+```sql
+ALTER TABLE bots
+    ADD COLUMN template_id INT NULL,
+    ADD COLUMN auto_update TINYINT(1) DEFAULT 1,
+    ADD COLUMN current_version VARCHAR(20) DEFAULT '1.0.0',
+    ADD COLUMN last_updated_at TIMESTAMP NULL;
+```
+
+---
+
+## Auto-actualización
+
+### Cómo funciona
+
+1. El admin actualiza la plantilla (nueva `version`, posiblemente nuevo `docker_image`)
+2. Los bots con `auto_update = 1` detectan que su `current_version < template.version`
+3. El sistema re-despliega el bot con la nueva imagen
+4. Se actualiza `current_version` y `last_updated_at`
+
+### Endpoint de verificación
+
+```
+GET /bots/check-updates  →  {updates: [...], count: N}
+```
+
+### SQL para bots actualizables
+
+```sql
+SELECT b.*, bt.version AS template_version
+FROM bots b
+JOIN bot_templates bt ON bt.id = b.template_id
+WHERE b.auto_update = 1
+  AND b.coolify_app_uuid IS NOT NULL
+  AND bt.auto_update_supported = 1
+  AND bt.version > b.current_version;
+```
+
+---
+
+## Formato JSON de variables
+
+### `required_env_vars`
+```json
+[{"key": "BOT_TOKEN", "label": "Token del Bot", "placeholder": "123456:ABC...", "required": true}]
+```
+
+### `default_env_vars`
+```json
+{"BOT_TOKEN": "", "PREFIX": "!", "LANGUAGE": "es"}
+```
+
+---
+
+## Migraciones
+
+| Archivo | Descripción |
+|---------|-------------|
+| `003_admin_and_bot_templates.sql` | Tabla `bot_templates` + 10 plantillas iniciales |
+| `004_auto_install_bots.sql` | Plataformas ampliadas, auto-update, 12 plantillas nuevas |
 
 - Imagen Docker preconfigurada
 - Variables de entorno con descripción y placeholders

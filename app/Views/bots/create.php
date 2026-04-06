@@ -1,13 +1,22 @@
 <?php
 $pageTitle = 'Desplegar nuevo bot';
-$platformIcons = ['telegram' => '✈️', 'discord' => '🎮', 'multi' => '🌐', 'other' => '⚙️'];
+$platformIcons = [
+    'telegram' => '✈️', 'discord' => '🎮', 'slack' => '💬', 'whatsapp' => '📱',
+    'twitch' => '🎮', 'matrix' => '🟢', 'reddit' => '🔶', 'mastodon' => '🐘',
+    'multi' => '🌐', 'other' => '⚙️'
+];
+$categoryLabels = [
+    'starter' => '🚀 Inicio', 'ai' => '🧠 IA', 'entertainment' => '🎵 Entretenimiento',
+    'moderation' => '🛡️ Moderación', 'utility' => '🔧 Utilidad', 'ecommerce' => '🛒 Comercio',
+    'social' => '📣 Social', 'monitoring' => '📊 Monitoreo', 'developer' => '⚙️ Desarrollo'
+];
 $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanzado'];
 $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'danger'];
 ?>
 <div class="page-header">
     <div>
         <h1>🚀 Desplegar nuevo bot</h1>
-        <p class="text-muted">Elige una plantilla y tendrás tu bot funcionando en minutos</p>
+        <p class="text-muted">Elige una plantilla, configura tus claves y tendrás tu bot funcionando en minutos</p>
     </div>
 </div>
 
@@ -26,11 +35,22 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
     <?php endif; ?>
 </div>
 
-<!-- Filtros -->
+<!-- Buscador -->
+<div class="tpl-search" style="margin-bottom:1rem">
+    <input type="text" id="templateSearch" class="form-control" placeholder="🔍 Buscar bots por nombre, plataforma o categoría..." style="max-width:500px">
+</div>
+
+<!-- Filtros por plataforma -->
 <div class="tpl-filters">
     <button class="tpl-filter active" data-filter="all">Todos</button>
     <button class="tpl-filter" data-filter="telegram">✈️ Telegram</button>
     <button class="tpl-filter" data-filter="discord">🎮 Discord</button>
+    <button class="tpl-filter" data-filter="slack">💬 Slack</button>
+    <button class="tpl-filter" data-filter="whatsapp">📱 WhatsApp</button>
+    <button class="tpl-filter" data-filter="twitch">🎮 Twitch</button>
+    <button class="tpl-filter" data-filter="reddit">🔶 Reddit</button>
+    <button class="tpl-filter" data-filter="mastodon">🐘 Mastodon</button>
+    <button class="tpl-filter" data-filter="matrix">🟢 Matrix</button>
     <button class="tpl-filter" data-filter="multi">🌐 Multi</button>
     <button class="tpl-filter" data-filter="ai">🧠 IA</button>
 </div>
@@ -43,15 +63,21 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
         $canInstall  = $isAdmin || $canCreateMore;
         $planOk      = $isAdmin || $userPlanOrder >= $planOrder[$t['min_plan_slug']];
         $available   = $canInstall && $planOk;
+        $autoUpdate  = !empty($t['auto_update_supported']);
     ?>
     <div class="tpl-card <?= !$available ? 'tpl-locked' : '' ?>"
          data-platform="<?= \App\Core\View::e($platform) ?>"
-         data-category="<?= \App\Core\View::e($category) ?>">
+         data-category="<?= \App\Core\View::e($category) ?>"
+         data-name="<?= \App\Core\View::e(strtolower($t['name'])) ?>"
+         data-tags="<?= \App\Core\View::e(strtolower($t['tags'] ?? '')) ?>">
         <div class="tpl-card-head">
             <span class="tpl-icon"><?= $t['icon'] ?></span>
             <div class="tpl-badges">
                 <span class="badge badge-platform badge-<?= $platform ?>"><?= $platformIcons[$platform] ?? '⚙️' ?> <?= ucfirst($platform) ?></span>
                 <span class="badge badge-<?= $diffColors[$t['difficulty']] ?? 'info' ?>"><?= $diffLabels[$t['difficulty']] ?? $t['difficulty'] ?></span>
+                <?php if ($autoUpdate): ?>
+                    <span class="badge badge-info" title="Se actualiza automáticamente">🔄 Auto</span>
+                <?php endif; ?>
             </div>
         </div>
         <div class="tpl-card-body">
@@ -69,7 +95,7 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
         <div class="tpl-card-footer">
             <?php if ($available): ?>
                 <a href="<?= APP_URL ?>/bots/from-template/<?= $t['id'] ?>" class="btn btn-primary btn-full">
-                    ⚡ Instalar
+                    ⚡ Instalar en 1 clic
                 </a>
             <?php elseif (!$planOk): ?>
                 <a href="<?= APP_URL ?>/plans" class="btn btn-outline btn-full">
@@ -88,44 +114,21 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
     <?php endforeach; ?>
 </div>
 
-<!-- Separador - creación manual -->
-<div class="tpl-manual-sep">
-    <span>¿Tienes tu propio código?</span>
+<?php if (empty($templates)): ?>
+<div class="empty-state">
+    <div class="empty-icon">🤖</div>
+    <p>No hay plantillas disponibles por el momento.</p>
 </div>
+<?php endif; ?>
 
-<div class="form-card" style="max-width:600px; margin:0 auto">
-    <h3 style="margin-bottom:.75rem">📁 Crear bot manualmente</h3>
-    <p class="text-muted" style="margin-bottom:1rem">Sube tu propio código y configúralo tú mismo.</p>
-    <form method="POST" action="<?= APP_URL ?>/bots">
-        <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
-        <div class="form-group">
-            <label for="name">Nombre del bot <span class="required">*</span></label>
-            <input type="text" id="name" name="name" class="form-control" placeholder="Mi bot personalizado" required>
-        </div>
-        <div class="form-group">
-            <label>Plataforma</label>
-            <div class="platform-selector">
-                <label class="platform-option"><input type="radio" name="platform" value="telegram" checked><span>✈️ Telegram</span></label>
-                <label class="platform-option"><input type="radio" name="platform" value="discord"><span>🎮 Discord</span></label>
-                <label class="platform-option"><input type="radio" name="platform" value="other"><span>⚙️ Otro</span></label>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="docker_image">Imagen Docker</label>
-            <input type="text" id="docker_image" name="docker_image" class="form-control" value="python:3.11-slim">
-        </div>
-        <div class="form-group">
-            <label for="description">Descripción (opcional)</label>
-            <textarea id="description" name="description" class="form-control" rows="2" placeholder="Qué hace este bot..."></textarea>
-        </div>
-        <div class="form-actions">
-            <a href="<?= APP_URL ?>/dashboard" class="btn btn-ghost">Cancelar</a>
-            <button type="submit" class="btn btn-outline">Crear bot manual →</button>
-        </div>
-    </form>
+<!-- Info de ayuda -->
+<div style="text-align:center; margin-top:2rem; padding:1.5rem; border:1px solid var(--border); border-radius:12px;">
+    <p style="margin:0 0 .5rem">¿Necesitas ayuda eligiendo un bot?</p>
+    <a href="<?= APP_URL ?>/help" class="btn btn-outline btn-sm">📖 Ver guía de ayuda</a>
 </div>
 
 <script>
+// Filtros por plataforma y categoría
 document.querySelectorAll('.tpl-filter').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.tpl-filter').forEach(b => b.classList.remove('active'));
@@ -137,5 +140,23 @@ document.querySelectorAll('.tpl-filter').forEach(btn => {
             card.style.display = match ? '' : 'none';
         });
     });
+});
+
+// Buscador
+document.getElementById('templateSearch').addEventListener('input', function() {
+    const q = this.value.toLowerCase().trim();
+    document.querySelectorAll('.tpl-card').forEach(card => {
+        if (!q) { card.style.display = ''; return; }
+        const name = card.dataset.name || '';
+        const tags = card.dataset.tags || '';
+        const platform = card.dataset.platform || '';
+        const match = name.includes(q) || tags.includes(q) || platform.includes(q);
+        card.style.display = match ? '' : 'none';
+    });
+    // Resetear filtro activo
+    if (q) {
+        document.querySelectorAll('.tpl-filter').forEach(b => b.classList.remove('active'));
+        document.querySelector('.tpl-filter[data-filter="all"]').classList.add('active');
+    }
 });
 </script>
