@@ -136,6 +136,16 @@ class CoolifyAPI
         return self::request('GET', '/applications/' . $uuid . '/deploy');
     }
 
+    public static function getDeployments(string $appUuid): array
+    {
+        return self::request('GET', '/deployments/applications/' . $appUuid . '?take=5');
+    }
+
+    public static function getDeployment(string $deploymentUuid): array
+    {
+        return self::request('GET', '/deployments/' . $deploymentUuid);
+    }
+
     public static function getResources(string $uuid): array
     {
         return self::request('GET', '/applications/' . $uuid);

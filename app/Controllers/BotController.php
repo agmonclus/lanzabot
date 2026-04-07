@@ -148,7 +148,6 @@ class BotController
                     'coolify_status'   => 'deploying',
                 ]);
                 CoolifyAPI::deploy($result['uuid']);
-                Bot::update($botId, ['coolify_status' => 'running']);
                 $deployed = true;
             } else {
                 $apiMsg = $result['message'] ?? $result['error'] ?? null;
@@ -248,8 +247,8 @@ class BotController
             }
 
             CoolifyAPI::deploy($uuid);
-            Bot::update($bot['id'], ['coolify_status' => 'running']);
-            Auth::flash('success', 'Bot desplegado correctamente.');
+            Bot::update($bot['id'], ['coolify_status' => 'deploying']);
+            Auth::flash('success', 'Despliegue iniciado. El estado se actualizará automáticamente.');
         } catch (\Exception $e) {
             Auth::flash('error', 'Error al desplegar: ' . $e->getMessage());
         }
@@ -266,7 +265,7 @@ class BotController
 
         if ($bot['coolify_app_uuid']) {
             CoolifyAPI::startApplication($bot['coolify_app_uuid']);
-            Bot::update($bot['id'], ['coolify_status' => 'running']);
+            Bot::update($bot['id'], ['coolify_status' => 'starting']);
         }
         View::redirect('/bots/' . $id);
     }
@@ -280,7 +279,7 @@ class BotController
 
         if ($bot['coolify_app_uuid']) {
             CoolifyAPI::stopApplication($bot['coolify_app_uuid']);
-            Bot::update($bot['id'], ['coolify_status' => 'stopped']);
+            Bot::update($bot['id'], ['coolify_status' => 'stopping']);
         }
         View::redirect('/bots/' . $id);
     }
@@ -294,7 +293,7 @@ class BotController
 
         if ($bot['coolify_app_uuid']) {
             CoolifyAPI::restartApplication($bot['coolify_app_uuid']);
-            Bot::update($bot['id'], ['coolify_status' => 'running']);
+            Bot::update($bot['id'], ['coolify_status' => 'restarting']);
         }
         View::redirect('/bots/' . $id);
     }
@@ -347,13 +346,42 @@ class BotController
 
         if (!$bot['coolify_app_uuid']) {
             View::json(['logs' => '', 'error' => 'Bot no desplegado aún.']);
+            return;
         }
 
         $result = CoolifyAPI::getLogs($bot['coolify_app_uuid'], 200);
         $logs   = $result['logs'] ?? ($result['data'] ?? '');
 
         if (is_array($logs)) {
-            $logs = implode("\n", array_map(fn($l) => $l['message'] ?? $l, $logs));
+            $logs = implode("\n", array_map(fn($l) => is_array($l) ? ($l['message'] ?? json_encode($l)) : $l, $logs));
+        }
+
+        // Si no hay logs de contenedor, intentar obtener info del último despliegue
+        if (empty(trim((string)$logs))) {
+            $deployments = CoolifyAPI::getDeployments($bot['coolify_app_uuid']);
+            if (!empty($deployments) && is_array($deployments)) {
+                // Buscar el último despliegue
+                $latest = null;
+                foreach ($deployments as $d) {
+                    if (is_array($d) && isset($d['deployment_uuid'])) {
+                        $latest = $d;
+                        break;
+                    }
+                }
+                if ($latest) {
+                    $depDetail = CoolifyAPI::getDeployment($latest['deployment_uuid']);
+                    $depLogs = $depDetail['logs'] ?? '';
+                    if ($depLogs) {
+                        $logs = "=== Logs del despliegue (" . ($latest['status'] ?? '?') . ") ===\n" . $depLogs;
+                    } else {
+                        $logs = "Estado del despliegue: " . ($latest['status'] ?? 'desconocido') . "\nAún no hay logs disponibles.";
+                    }
+                }
+            }
+        }
+
+        if (empty(trim((string)$logs))) {
+            $logs = 'No hay logs disponibles. El bot puede estar iniciándose o en un ciclo de reinicio.';
         }
 
         View::json(['logs' => $logs]);
@@ -366,13 +394,21 @@ class BotController
         $bot  = $this->getBot((int) $id, $user['id']);
 
         if (!$bot['coolify_app_uuid']) {
-            View::json(['error' => 'Bot no desplegado aún.']);
+            View::json(['error' => 'Bot no desplegado aún.', 'status' => 'not_deployed']);
+            return;
         }
 
-        $result = CoolifyAPI::getResources($bot['coolify_app_uuid']);
+        $result = CoolifyAPI::getApplication($bot['coolify_app_uuid']);
+        $realStatus = $result['status'] ?? null;
+
+        // Sincronizar estado real de Coolify con la BD
+        if ($realStatus && $realStatus !== ($bot['coolify_status'] ?? '')) {
+            Bot::update($bot['id'], ['coolify_status' => $realStatus]);
+        }
+
         View::json([
-            'status' => $result['status'] ?? $bot['coolify_status'],
-            'data'   => $result,
+            'status'    => $realStatus ?: ($bot['coolify_status'] ?? 'unknown'),
+            'http_code' => $result['_status'] ?? null,
         ]);
     }
 
@@ -429,7 +465,7 @@ class BotController
                 Bot::update($bot['id'], [
                     'current_version'  => $template['version'],
                     'last_updated_at'  => date('Y-m-d H:i:s'),
-                    'coolify_status'   => 'running',
+                    'coolify_status'   => 'deploying',
                 ]);
                 Auth::flash('success', 'Bot actualizado a la versión ' . $template['version'] . '.');
             } else {

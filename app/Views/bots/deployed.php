@@ -6,9 +6,9 @@ $platformIcons = ['telegram' => '✈️', 'discord' => '🎮', 'multi' => '🌐'
 <div class="deployed-container">
     <?php if ($deployed): ?>
         <div class="deployed-hero deployed-success">
-            <div class="deployed-icon">🎉</div>
-            <h1>¡Bot desplegado con éxito!</h1>
-            <p class="text-muted"><?= \App\Core\View::e($bot['name']) ?> ya está en funcionamiento</p>
+            <div class="deployed-icon">🚀</div>
+            <h1>¡Despliegue iniciado!</h1>
+            <p class="text-muted"><?= \App\Core\View::e($bot['name']) ?> se está desplegando. Puedes ver el estado y los logs en el panel del bot.</p>
         </div>
     <?php else: ?>
         <div class="deployed-hero deployed-warning">
@@ -40,7 +40,7 @@ $platformIcons = ['telegram' => '✈️', 'discord' => '🎮', 'multi' => '🌐'
                     <td class="label">Estado</td>
                     <td>
                         <?php if ($deployed): ?>
-                            <span class="status-badge status-running">En ejecución</span>
+                            <span class="status-badge status-deploying">⏳ Desplegando...</span>
                         <?php else: ?>
                             <span class="status-badge status-error">Error al desplegar</span>
                         <?php endif; ?>

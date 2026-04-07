@@ -28,7 +28,7 @@ $platformIcons = [
             <?= $platformIcons[$bot['platform']] ?? '🤖' ?>
             <?= \App\Core\View::e($bot['name']) ?>
         </h1>
-        <span class="bot-status status-<?= \App\Core\View::e($bot['coolify_status'] ?? 'stopped') ?>">
+        <span class="bot-status status-<?= \App\Core\View::e($bot['coolify_status'] ?? 'stopped') ?>" id="headerStatus">
             <?= \App\Core\View::e($bot['coolify_status'] ?? 'stopped') ?>
         </span>
         <?php if ($template): ?>
@@ -36,9 +36,14 @@ $platformIcons = [
         <?php endif; ?>
     </div>
 
-    <div class="bot-actions">
+    <div class="bot-actions" id="botActions">
         <?php if ($isDeployed): ?>
-            <?php if (($bot['coolify_status'] ?? '') === 'running'): ?>
+            <?php
+            $status = $bot['coolify_status'] ?? '';
+            $isRunning = str_contains($status, 'running');
+            $isTransitional = in_array($status, ['deploying', 'starting', 'stopping', 'restarting']);
+            ?>
+            <?php if ($isRunning): ?>
                 <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/stop" style="display:inline">
                     <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
                     <button class="btn btn-sm btn-outline">⏹ Stop</button>
@@ -47,6 +52,8 @@ $platformIcons = [
                     <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
                     <button class="btn btn-sm btn-outline">🔄 Restart</button>
                 </form>
+            <?php elseif ($isTransitional): ?>
+                <span class="btn btn-sm btn-outline" style="opacity:0.5;cursor:wait;">⏳ <?= ucfirst(\App\Core\View::e($status)) ?>...</span>
             <?php else: ?>
                 <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/start" style="display:inline">
                     <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
@@ -232,6 +239,34 @@ $platformIcons = [
 const BOT_ID = <?= $bot['id'] ?>;
 const BASE   = '<?= APP_URL ?>';
 let logTimer = null;
+let statsTimer = null;
+
+function statusLabel(s) {
+    const map = {
+        'running': '🟢 running',
+        'running:healthy': '🟢 running:healthy',
+        'running:unhealthy': '🟡 running:unhealthy',
+        'exited': '🔴 exited',
+        'restarting': '🔄 restarting',
+        'deploying': '⏳ deploying',
+        'starting': '⏳ starting',
+        'stopping': '⏳ stopping',
+        'stopped': '⏹ stopped',
+    };
+    // Buscar coincidencia parcial
+    for (const [key, label] of Object.entries(map)) {
+        if (s && s.startsWith(key)) return label;
+    }
+    return s || 'unknown';
+}
+
+function statusClass(s) {
+    if (!s) return 'status-unknown';
+    if (s.startsWith('running')) return 'status-running';
+    if (['deploying','starting','restarting'].some(x => s.startsWith(x))) return 'status-deploying';
+    if (s.startsWith('exited') || s.startsWith('error')) return 'status-exited';
+    return 'status-stopped';
+}
 
 async function fetchLogs() {
     try {
@@ -250,20 +285,36 @@ async function refreshStats() {
         const r = await fetch(BASE + '/bots/' + BOT_ID + '/stats');
         const d = await r.json();
         if (d.status) {
+            // Actualizar badge en sidebar
             const el = document.getElementById('botStatus');
-            if (el) { el.textContent = d.status; el.className = 'bot-status status-' + d.status; }
+            if (el) {
+                el.textContent = statusLabel(d.status);
+                el.className = 'bot-status ' + statusClass(d.status);
+            }
+            // Actualizar badge en header
+            const hdr = document.getElementById('headerStatus');
+            if (hdr) {
+                hdr.textContent = statusLabel(d.status);
+                hdr.className = 'bot-status ' + statusClass(d.status);
+            }
         }
     } catch(e) {}
 }
 
 function startAutoRefresh() {
     fetchLogs();
+    refreshStats();
     logTimer = setInterval(fetchLogs, 5000);
+    statsTimer = setInterval(refreshStats, 8000);
 }
 
 document.getElementById('autoRefresh').addEventListener('change', function() {
-    if (this.checked) startAutoRefresh();
-    else { clearInterval(logTimer); logTimer = null; }
+    if (this.checked) {
+        startAutoRefresh();
+    } else {
+        clearInterval(logTimer); logTimer = null;
+        clearInterval(statsTimer); statsTimer = null;
+    }
 });
 
 startAutoRefresh();
