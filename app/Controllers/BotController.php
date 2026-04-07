@@ -151,7 +151,13 @@ class BotController
                 Bot::update($botId, ['coolify_status' => 'running']);
                 $deployed = true;
             } else {
-                $deployError = $result['error'] ?? 'Coolify no devolvió UUID.';
+                $apiMsg = $result['message'] ?? $result['error'] ?? null;
+                $httpCode = $result['_status'] ?? '';
+                if ($apiMsg) {
+                    $deployError = 'Coolify error ' . $httpCode . ': ' . $apiMsg;
+                } else {
+                    $deployError = 'Coolify no devolvió UUID (HTTP ' . $httpCode . '). Respuesta: ' . json_encode(array_diff_key($result, ['_status' => 0]));
+                }
             }
         } catch (\Exception $e) {
             $deployError = $e->getMessage();

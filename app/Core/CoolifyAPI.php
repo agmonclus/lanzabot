@@ -38,6 +38,17 @@ class CoolifyAPI
 
         $decoded = json_decode($response, true) ?? [];
         $decoded['_status'] = $httpCode;
+
+        // Log en caso de error para diagnóstico
+        if ($httpCode >= 400 || ($httpCode === 0 && $error)) {
+            $logDir = defined('BASE_PATH') ? BASE_PATH . '/storage/logs' : __DIR__ . '/../../storage/logs';
+            @file_put_contents(
+                $logDir . '/coolify.log',
+                '[' . date('Y-m-d H:i:s') . '] ' . $method . ' ' . $endpoint . ' → HTTP ' . $httpCode . ' | ' . $response . PHP_EOL,
+                FILE_APPEND
+            );
+        }
+
         return $decoded;
     }
 
@@ -61,17 +72,24 @@ class CoolifyAPI
 
     public static function createApplication(string $botName, string $dockerImage, array $envVars = [], int $ramMb = 128): array
     {
-        return self::request('POST', '/applications', [
-            'project_uuid'   => COOLIFY_PROJECT_UUID,
-            'server_uuid'    => COOLIFY_SERVER_UUID,
-            'name'           => 'bot-' . $botName,
-            'build_pack'     => 'dockerfile',
-            'docker_image'   => $dockerImage,
-            'environment_variables' => $envVars,
-            'limits_memory'  => $ramMb . 'm',
-            'limits_cpus'    => '0.5',
-            'ports_exposes'  => '',
+        $result = self::request('POST', '/applications/dockerimage', [
+            'project_uuid'               => COOLIFY_PROJECT_UUID,
+            'server_uuid'                => COOLIFY_SERVER_UUID,
+            'environment_name'           => 'production',
+            'name'                       => 'bot-' . $botName,
+            'docker_registry_image_name' => $dockerImage,
+            'ports_exposes'              => '8080',
+            'instant_deploy'             => false,
+            'limits_memory'              => $ramMb . 'm',
+            'limits_cpus'                => '0.5',
         ]);
+
+        // Si se creó correctamente, añadir las env vars
+        if (!empty($result['uuid']) && !empty($envVars)) {
+            self::updateEnvVars($result['uuid'], $envVars);
+        }
+
+        return $result;
     }
 
     public static function getApplication(string $uuid): array
