@@ -95,6 +95,9 @@ $platformIcons = [
                     <?php if (!empty($template['documentation_url'])): ?>
                         <a href="<?= \App\Core\View::e($template['documentation_url']) ?>" target="_blank" rel="noopener">📖 Documentación</a>
                     <?php endif; ?>
+                    <?php if (!empty($template['more_info_url'])): ?>
+                        <a href="<?= \App\Core\View::e($template['more_info_url']) ?>" target="_blank" rel="noopener" class="btn btn-outline btn-sm">ℹ️ +info</a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

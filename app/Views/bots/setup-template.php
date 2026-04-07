@@ -32,6 +32,9 @@ $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanza
                         <span class="badge badge-success">🔄 Auto-actualizable</span>
                     <?php endif; ?>
                     <span class="text-muted"><?= $template['install_count'] ?> instalaciones</span>
+                    <?php if (!empty($template['more_info_url'])): ?>
+                        <a href="<?= \App\Core\View::e($template['more_info_url']) ?>" target="_blank" rel="noopener" class="btn btn-outline btn-sm">ℹ️ +info</a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

@@ -270,6 +270,7 @@ class AdminController
             'difficulty'         => $_POST['difficulty'] ?? 'easy',
             'tags'               => trim($_POST['tags'] ?? ''),
             'documentation_url'  => trim($_POST['documentation_url'] ?? '') ?: null,
+            'more_info_url'      => trim($_POST['more_info_url'] ?? '') ?: null,
             'setup_instructions' => trim($_POST['setup_instructions'] ?? '') ?: null,
             'is_featured'        => isset($_POST['is_featured']) ? 1 : 0,
             'is_active'          => isset($_POST['is_active']) ? 1 : 0,

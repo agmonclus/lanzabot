@@ -69,8 +69,8 @@ class BotTemplate
     public static function create(array $data): int
     {
         return Database::insert(
-            'INSERT INTO bot_templates (slug, name, description, short_description, platform, category, icon, docker_image, git_repo_url, default_env_vars, required_env_vars, ram_mb_min, min_plan_slug, difficulty, tags, documentation_url, setup_instructions, is_featured, is_active, sort_order)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO bot_templates (slug, name, description, short_description, platform, category, icon, docker_image, git_repo_url, default_env_vars, required_env_vars, ram_mb_min, min_plan_slug, difficulty, tags, documentation_url, more_info_url, setup_instructions, is_featured, is_active, sort_order)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $data['slug'],
                 $data['name'],
@@ -88,6 +88,7 @@ class BotTemplate
                 $data['difficulty'] ?? 'easy',
                 $data['tags'] ?? '',
                 $data['documentation_url'] ?? null,
+                $data['more_info_url'] ?? null,
                 $data['setup_instructions'] ?? null,
                 (int)($data['is_featured'] ?? 0),
                 (int)($data['is_active'] ?? 1),

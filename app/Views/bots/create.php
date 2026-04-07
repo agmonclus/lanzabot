@@ -132,6 +132,11 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
                     Límite de bots alcanzado
                 </span>
             <?php endif; ?>
+            <?php if (!empty($t['more_info_url'])): ?>
+                <a href="<?= \App\Core\View::e($t['more_info_url']) ?>" target="_blank" rel="noopener" class="btn btn-outline btn-full" style="margin-top:.4rem">
+                    ℹ️ +info
+                </a>
+            <?php endif; ?>
         </div>
         <?php if ($t['is_featured']): ?>
             <div class="tpl-featured-badge">⭐</div>

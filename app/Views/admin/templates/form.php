@@ -126,6 +126,12 @@ $t           = $template ?? [];
         </div>
 
         <div class="form-group">
+            <label for="more_info_url">URL más información (home del fabricante)</label>
+            <input type="url" id="more_info_url" name="more_info_url" class="form-control" value="<?= \App\Core\View::e($t['more_info_url'] ?? '') ?>" placeholder="https://proyecto.example.com">
+            <small class="form-hint">Enlace a la página principal del proyecto o fabricante del bot</small>
+        </div>
+
+        <div class="form-group">
             <label for="setup_instructions">Instrucciones de configuración</label>
             <textarea id="setup_instructions" name="setup_instructions" class="form-control" rows="5" placeholder="Paso a paso para configurar este bot..."><?= \App\Core\View::e($t['setup_instructions'] ?? '') ?></textarea>
         </div>
