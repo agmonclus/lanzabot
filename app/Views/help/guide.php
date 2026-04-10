@@ -113,7 +113,6 @@ $canInstall    = (int)$user['id'] === 1 || $userPlanOrder >= $reqPlanOrder;
                 <div class="stat-row"><span>RAM mínima</span><span><?= $template['ram_mb_min'] ?> MB</span></div>
                 <div class="stat-row"><span>Plan mínimo</span><span><?= ucfirst($template['min_plan_slug']) ?></span></div>
                 <div class="stat-row"><span>Dificultad</span><span><?= $diffLabels[$template['difficulty']] ?? $template['difficulty'] ?></span></div>
-                <div class="stat-row"><span>Instalaciones</span><span><?= $template['install_count'] ?></span></div>
                 <div class="stat-row"><span>Auto-update</span><span><?= !empty($template['auto_update_supported']) ? '✅ Sí' : '❌ No' ?></span></div>
             </div>
         </div>

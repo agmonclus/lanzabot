@@ -116,7 +116,6 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
             <?php else: ?>
                 <span class="tpl-plan-free">Gratis</span>
             <?php endif; ?>
-            <span class="tpl-installs"><?= $t['install_count'] ?> instalaciones</span>
         </div>
         <div class="tpl-card-footer">
             <?php if ($available): ?>

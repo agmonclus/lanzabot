@@ -18,7 +18,6 @@
                     <th>Categoría</th>
                     <th>Dificultad</th>
                     <th>Plan mín.</th>
-                    <th>Instalaciones</th>
                     <th>Destacada</th>
                     <th>Activa</th>
                     <th>Acciones</th>
@@ -42,7 +41,6 @@
                         <span class="badge badge-<?= $diffColors[$t['difficulty']] ?? 'info' ?>"><?= \App\Core\View::e($t['difficulty']) ?></span>
                     </td>
                     <td><code><?= \App\Core\View::e($t['min_plan_slug']) ?></code></td>
-                    <td><?= $t['install_count'] ?></td>
                     <td><?= $t['is_featured'] ? '⭐' : '—' ?></td>
                     <td><?= $t['is_active'] ? '✅' : '❌' ?></td>
                     <td>

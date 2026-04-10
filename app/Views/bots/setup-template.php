@@ -31,16 +31,19 @@ $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanza
                     <?php if (!empty($template['auto_update_supported'])): ?>
                         <span class="badge badge-success">🔄 Auto-actualizable</span>
                     <?php endif; ?>
-                    <span class="text-muted"><?= $template['install_count'] ?> instalaciones</span>
-                    <?php if (!empty($template['more_info_url'])): ?>
-                        <a href="<?= \App\Core\View::e($template['more_info_url']) ?>" target="_blank" rel="noopener" class="btn btn-outline btn-sm">ℹ️ +info</a>
-                    <?php endif; ?>
                 </div>
             </div>
         </div>
         <?php if ($template['description']): ?>
             <div class="setup-tpl-desc">
                 <?= nl2br(\App\Core\View::e($template['description'])) ?>
+            </div>
+        <?php endif; ?>
+        <?php if (!empty($template['more_info_url'])): ?>
+            <div class="setup-tpl-moreinfo">
+                <a href="<?= \App\Core\View::e($template['more_info_url']) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                    🔗 Página del fabricante
+                </a>
             </div>
         <?php endif; ?>
     </div>

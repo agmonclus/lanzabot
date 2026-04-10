@@ -92,6 +92,30 @@ class CoolifyAPI
         return $result;
     }
 
+    public static function createPublicApplication(string $botName, string $gitRepoUrl, array $envVars = [], int $ramMb = 128, string $buildPack = 'nixpacks', string $gitBranch = 'main'): array
+    {
+        $result = self::request('POST', '/applications/public', [
+            'project_uuid'     => COOLIFY_PROJECT_UUID,
+            'server_uuid'      => COOLIFY_SERVER_UUID,
+            'environment_name' => 'production',
+            'name'             => 'bot-' . $botName,
+            'git_repository'   => $gitRepoUrl,
+            'git_branch'       => $gitBranch,
+            'build_pack'       => $buildPack,
+            'ports_exposes'    => '8080',
+            'instant_deploy'   => false,
+            'limits_memory'    => $ramMb . 'm',
+            'limits_cpus'      => '0.5',
+        ]);
+
+        // Si se creó correctamente, añadir las env vars
+        if (!empty($result['uuid']) && !empty($envVars)) {
+            self::updateEnvVars($result['uuid'], $envVars);
+        }
+
+        return $result;
+    }
+
     public static function getApplication(string $uuid): array
     {
         return self::request('GET', '/applications/' . $uuid);

@@ -140,7 +140,16 @@ class BotController
         try {
             $ramMb = $plan['ram_mb'] ?? 128;
             $slug  = preg_replace('/[^a-z0-9]/', '-', strtolower($botName)) . '-' . $botId;
-            $result = CoolifyAPI::createApplication($slug, $template['docker_image'], $envVars, $ramMb);
+
+            // Si el template tiene repositorio git, desplegar desde repo público;
+            // si no, desplegar como imagen Docker directa (ej. n8nio/n8n:latest)
+            $gitRepoUrl = $template['git_repo_url'] ?? null;
+            $gitBranch  = $template['git_branch'] ?? 'main';
+            if (!empty($gitRepoUrl)) {
+                $result = CoolifyAPI::createPublicApplication($slug, $gitRepoUrl, $envVars, $ramMb, 'nixpacks', $gitBranch);
+            } else {
+                $result = CoolifyAPI::createApplication($slug, $template['docker_image'], $envVars, $ramMb);
+            }
 
             if (!empty($result['uuid'])) {
                 Bot::update($botId, [
@@ -230,7 +239,21 @@ class BotController
             // Create application in Coolify if not exists
             if (!$bot['coolify_app_uuid']) {
                 $slug   = preg_replace('/[^a-z0-9]/', '-', strtolower($bot['name'])) . '-' . $bot['id'];
-                $result = CoolifyAPI::createApplication($slug, $bot['docker_image'], $envVars, $ramMb);
+
+                // Si el bot viene de un template con repositorio git, desplegar desde repo
+                $gitRepoUrl = null;
+                $gitBranch = 'main';
+                if (!empty($bot['template_id'])) {
+                    $tpl = BotTemplate::find((int)$bot['template_id']);
+                    $gitRepoUrl = $tpl['git_repo_url'] ?? null;
+                    $gitBranch  = $tpl['git_branch'] ?? 'main';
+                }
+
+                if (!empty($gitRepoUrl)) {
+                    $result = CoolifyAPI::createPublicApplication($slug, $gitRepoUrl, $envVars, $ramMb, 'nixpacks', $gitBranch);
+                } else {
+                    $result = CoolifyAPI::createApplication($slug, $bot['docker_image'], $envVars, $ramMb);
+                }
 
                 if (empty($result['uuid'])) {
                     throw new \RuntimeException('Coolify no devolvió UUID: ' . json_encode($result));

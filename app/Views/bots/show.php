@@ -98,7 +98,6 @@ $platformIcons = [
                 <p style="margin:0 0 .75rem"><?= \App\Core\View::e($template['short_description']) ?></p>
                 <div style="display:flex; gap:1rem; flex-wrap:wrap; font-size:.85rem; color:var(--text-muted);">
                     <span>📦 <?= \App\Core\View::e($bot['docker_image']) ?></span>
-                    <span>📊 <?= $template['install_count'] ?> instalaciones</span>
                     <?php if (!empty($template['documentation_url'])): ?>
                         <a href="<?= \App\Core\View::e($template['documentation_url']) ?>" target="_blank" rel="noopener">📖 Documentación</a>
                     <?php endif; ?>
