@@ -92,9 +92,9 @@ class CoolifyAPI
         return $result;
     }
 
-    public static function createPublicApplication(string $botName, string $gitRepoUrl, array $envVars = [], int $ramMb = 128, string $buildPack = 'nixpacks', string $gitBranch = 'main'): array
+    public static function createPublicApplication(string $botName, string $gitRepoUrl, array $envVars = [], int $ramMb = 128, string $buildPack = 'nixpacks', string $gitBranch = 'main', ?string $installCommand = null): array
     {
-        $result = self::request('POST', '/applications/public', [
+        $payload = [
             'project_uuid'     => COOLIFY_PROJECT_UUID,
             'server_uuid'      => COOLIFY_SERVER_UUID,
             'environment_name' => 'production',
@@ -106,7 +106,13 @@ class CoolifyAPI
             'instant_deploy'   => false,
             'limits_memory'    => $ramMb . 'm',
             'limits_cpus'      => '0.5',
-        ]);
+        ];
+
+        if ($installCommand) {
+            $payload['install_command'] = $installCommand;
+        }
+
+        $result = self::request('POST', '/applications/public', $payload);
 
         // Si se creó correctamente, añadir las env vars
         if (!empty($result['uuid']) && !empty($envVars)) {

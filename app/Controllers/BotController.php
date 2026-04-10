@@ -143,10 +143,11 @@ class BotController
 
             // Si el template tiene repositorio git, desplegar desde repo público;
             // si no, desplegar como imagen Docker directa (ej. n8nio/n8n:latest)
-            $gitRepoUrl = $template['git_repo_url'] ?? null;
-            $gitBranch  = $template['git_branch'] ?? 'main';
+            $gitRepoUrl     = $template['git_repo_url'] ?? null;
+            $gitBranch      = $template['git_branch'] ?? 'main';
+            $installCommand = $template['install_command'] ?? null;
             if (!empty($gitRepoUrl)) {
-                $result = CoolifyAPI::createPublicApplication($slug, $gitRepoUrl, $envVars, $ramMb, 'nixpacks', $gitBranch);
+                $result = CoolifyAPI::createPublicApplication($slug, $gitRepoUrl, $envVars, $ramMb, 'nixpacks', $gitBranch, $installCommand);
             } else {
                 $result = CoolifyAPI::createApplication($slug, $template['docker_image'], $envVars, $ramMb);
             }
@@ -243,14 +244,16 @@ class BotController
                 // Si el bot viene de un template con repositorio git, desplegar desde repo
                 $gitRepoUrl = null;
                 $gitBranch = 'main';
+                $installCommand = null;
                 if (!empty($bot['template_id'])) {
                     $tpl = BotTemplate::find((int)$bot['template_id']);
-                    $gitRepoUrl = $tpl['git_repo_url'] ?? null;
-                    $gitBranch  = $tpl['git_branch'] ?? 'main';
+                    $gitRepoUrl     = $tpl['git_repo_url'] ?? null;
+                    $gitBranch      = $tpl['git_branch'] ?? 'main';
+                    $installCommand = $tpl['install_command'] ?? null;
                 }
 
                 if (!empty($gitRepoUrl)) {
-                    $result = CoolifyAPI::createPublicApplication($slug, $gitRepoUrl, $envVars, $ramMb, 'nixpacks', $gitBranch);
+                    $result = CoolifyAPI::createPublicApplication($slug, $gitRepoUrl, $envVars, $ramMb, 'nixpacks', $gitBranch, $installCommand);
                 } else {
                     $result = CoolifyAPI::createApplication($slug, $bot['docker_image'], $envVars, $ramMb);
                 }
