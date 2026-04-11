@@ -51,10 +51,13 @@ $t           = $template ?? [];
                 <select id="category" name="category" class="form-control">
                     <?php
                     $cats = [
-                        'ai' => 'IA', 'productivity' => 'Productividad', 'commerce' => 'Comercio',
-                        'ecommerce' => 'E-Commerce', 'finance' => 'Finanzas', 'entertainment' => 'Entretenimiento',
-                        'gaming' => 'Gaming', 'moderation' => 'Moderación', 'security' => 'Seguridad',
-                        'social' => 'Social', 'education' => 'Educación', 'marketing' => 'Marketing',
+                        'ai' => 'IA y Agentes', 'communication' => 'Comunicaciones',
+                        'finance' => 'Finanzas y Comercio', 'moderation' => 'Moderación y Seguridad',
+                        'marketing' => 'Marketing y Desarrollo',
+                        'productivity' => 'Productividad', 'commerce' => 'Comercio',
+                        'ecommerce' => 'E-Commerce', 'entertainment' => 'Entretenimiento',
+                        'gaming' => 'Gaming', 'security' => 'Seguridad',
+                        'social' => 'Social', 'education' => 'Educación',
                         'monitoring' => 'Monitoreo', 'developer' => 'Desarrollo', 'utility' => 'Utilidad',
                         'starter' => 'Inicio'
                     ];

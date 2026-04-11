@@ -6,11 +6,15 @@ $platformIcons = [
     'multi' => '🌐', 'other' => '⚙️'
 ];
 $categoryLabels = [
-    'starter' => '🚀 Inicio', 'ai' => '🧠 IA', 'entertainment' => '🎵 Entretenimiento',
-    'moderation' => '🛡️ Moderación', 'utility' => '🔧 Utilidad', 'ecommerce' => '🛒 Comercio',
+    'ai' => '🧠 IA y Agentes', 'communication' => '📡 Comunicaciones',
+    'finance' => '💰 Finanzas y Comercio', 'moderation' => '🛡️ Moderación y Seguridad',
+    'marketing' => '📢 Marketing y Desarrollo',
+    // Retrocompat para templates antiguos:
+    'starter' => '🚀 Inicio', 'entertainment' => '🎵 Entretenimiento',
+    'utility' => '🔧 Utilidad', 'ecommerce' => '🛒 Comercio',
     'commerce' => '🛒 Comercio', 'social' => '📣 Social', 'monitoring' => '📊 Monitoreo',
-    'developer' => '⚙️ Desarrollo', 'finance' => '💰 Finanzas', 'gaming' => '🕹️ Gaming',
-    'education' => '📚 Educación', 'marketing' => '📢 Marketing', 'security' => '🔐 Seguridad',
+    'developer' => '⚙️ Desarrollo', 'gaming' => '🕹️ Gaming',
+    'education' => '📚 Educación', 'security' => '🔐 Seguridad',
     'productivity' => '⏱️ Productividad'
 ];
 $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanzado'];
@@ -62,22 +66,11 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
 <div style="margin-bottom:.5rem"><small class="text-muted"><strong>Funcionalidad:</strong></small></div>
 <div class="tpl-filters" id="categoryFilters">
     <button class="tpl-filter active" data-filter="all" data-type="category">Todas</button>
-    <button class="tpl-filter" data-filter="ai" data-type="category">🧠 IA</button>
-    <button class="tpl-filter" data-filter="productivity" data-type="category">⏱️ Productividad</button>
-    <button class="tpl-filter" data-filter="commerce" data-type="category">🛒 Comercio</button>
-    <button class="tpl-filter" data-filter="ecommerce" data-type="category">🛒 E-Commerce</button>
-    <button class="tpl-filter" data-filter="finance" data-type="category">💰 Finanzas</button>
-    <button class="tpl-filter" data-filter="entertainment" data-type="category">🎵 Entretenimiento</button>
-    <button class="tpl-filter" data-filter="gaming" data-type="category">🕹️ Gaming</button>
-    <button class="tpl-filter" data-filter="moderation" data-type="category">🛡️ Moderación</button>
-    <button class="tpl-filter" data-filter="security" data-type="category">🔐 Seguridad</button>
-    <button class="tpl-filter" data-filter="social" data-type="category">📣 Social</button>
-    <button class="tpl-filter" data-filter="education" data-type="category">📚 Educación</button>
-    <button class="tpl-filter" data-filter="marketing" data-type="category">📢 Marketing</button>
-    <button class="tpl-filter" data-filter="monitoring" data-type="category">📊 Monitoreo</button>
-    <button class="tpl-filter" data-filter="developer" data-type="category">⚙️ Desarrollo</button>
-    <button class="tpl-filter" data-filter="utility" data-type="category">🔧 Utilidad</button>
-    <button class="tpl-filter" data-filter="starter" data-type="category">🚀 Inicio</button>
+    <button class="tpl-filter" data-filter="ai" data-type="category">🧠 IA y Agentes</button>
+    <button class="tpl-filter" data-filter="communication" data-type="category">📡 Comunicaciones</button>
+    <button class="tpl-filter" data-filter="finance" data-type="category">💰 Finanzas y Comercio</button>
+    <button class="tpl-filter" data-filter="moderation" data-type="category">🛡️ Moderación y Seguridad</button>
+    <button class="tpl-filter" data-filter="marketing" data-type="category">📢 Marketing y Desarrollo</button>
 </div>
 
 <!-- Catálogo de plantillas -->
