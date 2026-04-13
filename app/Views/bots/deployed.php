@@ -22,7 +22,7 @@ $platformIcons = ['telegram' => '', 'discord' => '', 'multi' => '', 'other' => '
     <!-- Resumen del bot -->
     <div class="deployed-summary">
         <div class="deployed-card">
-            <h3><?= $template['icon'] ?> <?= \App\Core\View::e($bot['name']) ?></h3>
+            <h3><img src="<?= APP_URL ?>/img/logos/logo_<?= (int)$template['id'] ?>.png" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;vertical-align:middle;border-radius:3px;margin-right:.35rem" onerror="this.outerHTML='<?= $template['icon'] ?> '"><?= \App\Core\View::e($bot['name']) ?></h3>
             <table class="deployed-info-table">
                 <tr>
                     <td class="label">Plataforma</td>

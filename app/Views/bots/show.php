@@ -94,7 +94,7 @@ $platformIcons = [
         <?php if ($template): ?>
         <div class="card">
             <div class="card-header">
-                <h3><?= $template['icon'] ?> Plantilla</h3>
+                <h3><img src="<?= APP_URL ?>/img/logos/logo_<?= (int)$template['id'] ?>.png" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;vertical-align:middle;border-radius:3px;margin-right:.35rem" onerror="this.outerHTML='<?= $template['icon'] ?> '">Plantilla</h3>
                 <span class="badge badge-platform badge-<?= $template['platform'] ?>"><?= ucfirst($template['platform']) ?></span>
             </div>
             <div class="card-body">

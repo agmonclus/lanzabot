@@ -73,6 +73,15 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
     <button class="tpl-filter" data-filter="marketing" data-type="category">Marketing y Desarrollo</button>
 </div>
 
+<!-- Filtros por dificultad -->
+<div style="margin-bottom:.5rem"><small class="text-muted"><strong>Dificultad:</strong></small></div>
+<div class="tpl-filters" id="difficultyFilters" style="margin-bottom:1.5rem">
+    <button class="tpl-filter active" data-filter="all" data-type="difficulty">Todas</button>
+    <button class="tpl-filter" data-filter="easy" data-type="difficulty">Fácil</button>
+    <button class="tpl-filter" data-filter="medium" data-type="difficulty">Medio</button>
+    <button class="tpl-filter" data-filter="advanced" data-type="difficulty">Avanzado</button>
+</div>
+
 <!-- Catálogo de plantillas -->
 <div class="tpl-grid" id="templateGrid">
     <?php foreach ($templates as $t):
@@ -86,14 +95,16 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
     <div class="tpl-card <?= !$available ? 'tpl-locked' : '' ?>"
          data-platform="<?= \App\Core\View::e($platform) ?>"
          data-category="<?= \App\Core\View::e($category) ?>"
+         data-difficulty="<?= \App\Core\View::e($t['difficulty'] ?? '') ?>"
          data-name="<?= \App\Core\View::e(strtolower($t['name'])) ?>"
          data-tags="<?= \App\Core\View::e(strtolower($t['tags'] ?? '')) ?>">
         <div class="tpl-card-head">
-            <span class="tpl-icon"><?= $t['icon'] ?></span>
+            <img src="<?= APP_URL ?>/img/logos/logo_<?= (int)$t['id'] ?>.png" alt="" class="tpl-logo" onerror="this.style.display='none';this.nextElementSibling.style.display=''">
+            <span class="tpl-icon" style="display:none"><?= $t['icon'] ?></span>
             <div class="tpl-badges">
-                <span class="badge badge-platform badge-<?= $platform ?>"><?= $platformIcons[$platform] ?? '' ?> <?= ucfirst($platform) ?></span>
-                <span class="badge badge-category"><?= $categoryLabels[$category] ?? ucfirst($category) ?></span>
-                <span class="badge badge-<?= $diffColors[$t['difficulty']] ?? 'info' ?>"><?= $diffLabels[$t['difficulty']] ?? $t['difficulty'] ?></span>
+                <span class="badge badge-platform badge-<?= $platform ?>" style="cursor:pointer" title="Filtrar por <?= ucfirst($platform) ?>" data-badge-type="platform" data-badge-value="<?= \App\Core\View::e($platform) ?>"><?= $platformIcons[$platform] ?? '' ?> <?= ucfirst($platform) ?></span>
+                <span class="badge badge-category" style="cursor:pointer" title="Filtrar por <?= $categoryLabels[$category] ?? ucfirst($category) ?>" data-badge-type="category" data-badge-value="<?= \App\Core\View::e($category) ?>"><?= $categoryLabels[$category] ?? ucfirst($category) ?></span>
+                <span class="badge badge-<?= $diffColors[$t['difficulty']] ?? 'info' ?>" style="cursor:pointer" title="Filtrar por dificultad" data-badge-type="difficulty" data-badge-value="<?= \App\Core\View::e($t['difficulty'] ?? '') ?>"><?= $diffLabels[$t['difficulty']] ?? $t['difficulty'] ?></span>
             </div>
         </div>
         <div class="tpl-card-body">
@@ -110,7 +121,7 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
         <div class="tpl-card-footer">
             <?php if ($available): ?>
                 <a href="<?= APP_URL ?>/bots/from-template/<?= $t['id'] ?>" class="btn btn-primary btn-full">
-                    Instalar ahora
+                    preparar lanzamiento
                 </a>
             <?php elseif (!$planOk): ?>
                 <a href="<?= APP_URL ?>/plans" class="btn btn-outline btn-full">
@@ -123,7 +134,7 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
             <?php endif; ?>
             <?php if (!empty($t['more_info_url'])): ?>
                 <a href="<?= \App\Core\View::e($t['more_info_url']) ?>" target="_blank" rel="noopener" class="btn btn-outline btn-full" style="margin-top:.4rem">
-                    +info
+                    web del fabricante
                 </a>
             <?php endif; ?>
         </div>
@@ -151,14 +162,17 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
 // Estado de filtros activos
 let activePlatform = 'all';
 let activeCategory = 'all';
+let activeDifficulty = 'all';
 
 function applyFilters() {
     document.querySelectorAll('.tpl-card').forEach(card => {
         const platform = card.dataset.platform || '';
         const category = card.dataset.category || '';
+        const difficulty = card.dataset.difficulty || '';
         const matchPlatform = activePlatform === 'all' || platform === activePlatform;
         const matchCategory = activeCategory === 'all' || category === activeCategory;
-        card.style.display = (matchPlatform && matchCategory) ? '' : 'none';
+        const matchDifficulty = activeDifficulty === 'all' || difficulty === activeDifficulty;
+        card.style.display = (matchPlatform && matchCategory && matchDifficulty) ? '' : 'none';
     });
 }
 
@@ -182,6 +196,52 @@ document.querySelectorAll('#categoryFilters .tpl-filter').forEach(btn => {
     });
 });
 
+// Filtros por dificultad
+document.querySelectorAll('#difficultyFilters .tpl-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('#difficultyFilters .tpl-filter').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeDifficulty = btn.dataset.filter;
+        applyFilters();
+    });
+});
+
+// Click en badges de las tarjetas para filtrar
+document.querySelectorAll('.tpl-badges [data-badge-type]').forEach(badge => {
+    badge.addEventListener('click', (e) => {
+        e.preventDefault();
+        const type = badge.dataset.badgeType;
+        const value = badge.dataset.badgeValue;
+        document.getElementById('templateSearch').value = '';
+
+        // Resetear todos los filtros a "all"
+        document.querySelectorAll('#platformFilters .tpl-filter').forEach(b => b.classList.remove('active'));
+        document.querySelector('#platformFilters .tpl-filter[data-filter="all"]').classList.add('active');
+        activePlatform = 'all';
+        document.querySelectorAll('#categoryFilters .tpl-filter').forEach(b => b.classList.remove('active'));
+        document.querySelector('#categoryFilters .tpl-filter[data-filter="all"]').classList.add('active');
+        activeCategory = 'all';
+        document.querySelectorAll('#difficultyFilters .tpl-filter').forEach(b => b.classList.remove('active'));
+        document.querySelector('#difficultyFilters .tpl-filter[data-filter="all"]').classList.add('active');
+        activeDifficulty = 'all';
+
+        // Activar solo el filtro del badge clicado
+        if (type === 'platform') {
+            const btn = document.querySelector('#platformFilters .tpl-filter[data-filter="' + value + '"]');
+            if (btn) { btn.classList.remove('active'); document.querySelector('#platformFilters .tpl-filter[data-filter="all"]').classList.remove('active'); btn.classList.add('active'); activePlatform = value; }
+        } else if (type === 'category') {
+            const btn = document.querySelector('#categoryFilters .tpl-filter[data-filter="' + value + '"]');
+            if (btn) { btn.classList.remove('active'); document.querySelector('#categoryFilters .tpl-filter[data-filter="all"]').classList.remove('active'); btn.classList.add('active'); activeCategory = value; }
+        } else if (type === 'difficulty') {
+            const btn = document.querySelector('#difficultyFilters .tpl-filter[data-filter="' + value + '"]');
+            if (btn) { btn.classList.remove('active'); document.querySelector('#difficultyFilters .tpl-filter[data-filter="all"]').classList.remove('active'); btn.classList.add('active'); activeDifficulty = value; }
+        }
+
+        applyFilters();
+        document.querySelector('.tpl-search').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+});
+
 // Buscador
 document.getElementById('templateSearch').addEventListener('input', function() {
     const q = this.value.toLowerCase().trim();
@@ -190,8 +250,10 @@ document.getElementById('templateSearch').addEventListener('input', function() {
         document.querySelectorAll('.tpl-filter').forEach(b => b.classList.remove('active'));
         document.querySelector('#platformFilters .tpl-filter[data-filter="all"]').classList.add('active');
         document.querySelector('#categoryFilters .tpl-filter[data-filter="all"]').classList.add('active');
+        document.querySelector('#difficultyFilters .tpl-filter[data-filter="all"]').classList.add('active');
         activePlatform = 'all';
         activeCategory = 'all';
+        activeDifficulty = 'all';
     }
     document.querySelectorAll('.tpl-card').forEach(card => {
         if (!q) { applyFilters(); return; }

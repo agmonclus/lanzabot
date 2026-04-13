@@ -18,7 +18,8 @@ $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanza
     <!-- Info de la plantilla -->
     <div class="setup-tpl-info">
         <div class="setup-tpl-header">
-            <span class="tpl-icon-lg"><?= $template['icon'] ?></span>
+            <img src="<?= APP_URL ?>/img/logos/logo_<?= (int)$template['id'] ?>.png" alt="" class="tpl-logo-lg" onerror="this.style.display='none';this.nextElementSibling.style.display=''">
+            <span class="tpl-icon-lg" style="display:none"><?= $template['icon'] ?></span>
             <div>
                 <h1><?= \App\Core\View::e($template['name']) ?></h1>
                 <p class="text-muted"><?= \App\Core\View::e($template['short_description']) ?></p>

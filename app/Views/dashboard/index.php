@@ -52,7 +52,11 @@ $platformIcons = [
         <?php foreach ($bots as $bot): ?>
         <a href="<?= APP_URL ?>/bots/<?= $bot['id'] ?>" class="bot-card">
             <div class="bot-card-header">
+                <?php if (!empty($bot['template_id'])): ?>
+                <img src="<?= APP_URL ?>/img/logos/logo_<?= (int)$bot['template_id'] ?>.png" alt="" style="width:1.5rem;height:1.5rem;object-fit:contain;border-radius:3px" onerror="this.style.display='none'">
+                <?php else: ?>
                 <span class="bot-platform <?= $bot['platform'] ?>"><?= $platformIcons[$bot['platform']] ?? '' ?></span>
+                <?php endif; ?>
                 <span class="bot-status status-<?= \App\Core\View::e($bot['coolify_status'] ?? 'stopped') ?>">
                     <?= \App\Core\View::e($bot['coolify_status'] ?? 'stopped') ?>
                 </span>
