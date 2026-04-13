@@ -54,6 +54,10 @@ $router->post('/bots/{id}/restart',         'BotController@restart');
 $router->post('/bots/{id}/delete',          'BotController@destroy');
 $router->get('/bots/{id}/logs',             'BotController@logs');
 $router->get('/bots/{id}/stats',            'BotController@stats');
+$router->get('/bots/{id}/files',            'BotController@files');
+$router->post('/bots/{id}/files/create',    'BotController@createFile');
+$router->post('/bots/{id}/files/update',    'BotController@updateFile');
+$router->post('/bots/{id}/files/delete',    'BotController@deleteFile');
 
 // Plans
 $router->get('/plans',              'PlanController@index');

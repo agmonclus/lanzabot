@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Core\Auth;
 use App\Core\View;
 use App\Core\CoolifyAPI;
+use App\Core\StarterCode;
 use App\Models\Bot;
 use App\Models\BotTemplate;
 
@@ -157,6 +158,10 @@ class BotController
                     'coolify_app_uuid' => $result['uuid'],
                     'coolify_status'   => 'deploying',
                 ]);
+
+                // Configurar almacenamiento y código inicial si la plantilla lo requiere
+                $this->setupStorage($result['uuid'], $botId, $template);
+
                 CoolifyAPI::deploy($result['uuid']);
                 $deployed = true;
             } else {
@@ -266,6 +271,12 @@ class BotController
                     'coolify_app_uuid' => $result['uuid'],
                     'coolify_status'   => 'deploying',
                 ]);
+
+                // Configurar almacenamiento y código inicial si el bot viene de una plantilla
+                if (!empty($bot['template_id'])) {
+                    $this->setupStorage($result['uuid'], $bot['id'], $tpl ?? BotTemplate::find((int)$bot['template_id']));
+                }
+
                 $uuid = $result['uuid'];
             } else {
                 $uuid = $bot['coolify_app_uuid'];
@@ -529,7 +540,183 @@ class BotController
         View::json(['updates' => $updates, 'count' => count($updates)]);
     }
 
+    // ---- Gestor de archivos ----
+
+    public function files(string $id): void
+    {
+        Auth::require();
+        $user = Auth::user();
+        $bot  = $this->getBot((int) $id, $user['id']);
+
+        if (!$bot['coolify_app_uuid']) {
+            Auth::flash('error', 'El bot debe estar desplegado para gestionar archivos.');
+            View::redirect('/bots/' . $id);
+            return;
+        }
+
+        $storages = CoolifyAPI::listStorages($bot['coolify_app_uuid']);
+        $fileStorages       = $storages['file_storages'] ?? [];
+        $persistentStorages = $storages['persistent_storages'] ?? [];
+
+        // Determinar archivo activo (seleccionado o el primero)
+        $activeUuid = $_GET['file'] ?? null;
+        $activeFile = null;
+        if ($activeUuid) {
+            foreach ($fileStorages as $fs) {
+                if (($fs['uuid'] ?? '') === $activeUuid) {
+                    $activeFile = $fs;
+                    break;
+                }
+            }
+        }
+        if (!$activeFile && !empty($fileStorages)) {
+            $activeFile = $fileStorages[0];
+        }
+
+        $template = null;
+        if ($bot['template_id']) {
+            $template = BotTemplate::find((int) $bot['template_id']);
+        }
+
+        View::render('bots/files', compact(
+            'user', 'bot', 'fileStorages', 'persistentStorages',
+            'activeFile', 'template'
+        ));
+    }
+
+    public function createFile(string $id): void
+    {
+        Auth::require();
+        $this->verifyCsrf();
+        $user = Auth::user();
+        $bot  = $this->getBot((int) $id, $user['id']);
+
+        if (!$bot['coolify_app_uuid']) {
+            Auth::flash('error', 'Bot no desplegado.');
+            View::redirect('/bots/' . $id);
+            return;
+        }
+
+        $mountPath = trim($_POST['mount_path'] ?? '');
+        $content   = $_POST['content'] ?? '';
+
+        // Validar ruta
+        if (!$mountPath || $mountPath[0] !== '/') {
+            Auth::flash('error', 'La ruta debe ser absoluta (empezar con /).');
+            View::redirect('/bots/' . $id . '/files');
+            return;
+        }
+
+        // Si se subió un archivo, leer su contenido
+        if (!empty($_FILES['upload_file']['tmp_name']) && $_FILES['upload_file']['error'] === UPLOAD_ERR_OK) {
+            $content = file_get_contents($_FILES['upload_file']['tmp_name']);
+            if ($mountPath === '/' || substr($mountPath, -1) === '/') {
+                $mountPath = rtrim($mountPath, '/') . '/' . basename($_FILES['upload_file']['name']);
+            }
+        }
+
+        $result = CoolifyAPI::createFileStorage($bot['coolify_app_uuid'], $mountPath, $content);
+        if (!empty($result['uuid']) || (($result['_status'] ?? 0) >= 200 && ($result['_status'] ?? 0) < 300)) {
+            Auth::flash('success', 'Archivo creado. Reinicia el bot para aplicar cambios.');
+        } else {
+            Auth::flash('error', 'Error al crear archivo: ' . ($result['message'] ?? json_encode($result)));
+        }
+
+        View::redirect('/bots/' . $id . '/files');
+    }
+
+    public function updateFile(string $id): void
+    {
+        Auth::require();
+        $this->verifyCsrf();
+        $user = Auth::user();
+        $bot  = $this->getBot((int) $id, $user['id']);
+
+        if (!$bot['coolify_app_uuid']) {
+            Auth::flash('error', 'Bot no desplegado.');
+            View::redirect('/bots/' . $id);
+            return;
+        }
+
+        $storageUuid = $_POST['storage_uuid'] ?? '';
+        $content     = $_POST['content'] ?? '';
+
+        if (!$storageUuid) {
+            Auth::flash('error', 'Archivo no especificado.');
+            View::redirect('/bots/' . $id . '/files');
+            return;
+        }
+
+        $result = CoolifyAPI::updateFileStorage($bot['coolify_app_uuid'], $storageUuid, $content);
+        if (($result['_status'] ?? 0) >= 200 && ($result['_status'] ?? 0) < 300) {
+            Auth::flash('success', 'Archivo guardado. Reinicia el bot para aplicar cambios.');
+        } else {
+            Auth::flash('error', 'Error al guardar: ' . ($result['message'] ?? json_encode($result)));
+        }
+
+        View::redirect('/bots/' . $id . '/files?file=' . urlencode($storageUuid));
+    }
+
+    public function deleteFile(string $id): void
+    {
+        Auth::require();
+        $this->verifyCsrf();
+        $user = Auth::user();
+        $bot  = $this->getBot((int) $id, $user['id']);
+
+        if (!$bot['coolify_app_uuid']) {
+            Auth::flash('error', 'Bot no desplegado.');
+            View::redirect('/bots/' . $id);
+            return;
+        }
+
+        $storageUuid = $_POST['storage_uuid'] ?? '';
+        if (!$storageUuid) {
+            Auth::flash('error', 'Archivo no especificado.');
+            View::redirect('/bots/' . $id . '/files');
+            return;
+        }
+
+        $result = CoolifyAPI::deleteStorage($bot['coolify_app_uuid'], $storageUuid);
+        if (($result['_status'] ?? 0) >= 200 && ($result['_status'] ?? 0) < 300) {
+            Auth::flash('success', 'Archivo eliminado. Reinicia el bot para aplicar cambios.');
+        } else {
+            Auth::flash('error', 'Error al eliminar: ' . ($result['message'] ?? json_encode($result)));
+        }
+
+        View::redirect('/bots/' . $id . '/files');
+    }
+
     // ---- Helpers ----
+
+    /**
+     * Configura almacenamiento persistente y código inicial para un bot recién creado en Coolify.
+     */
+    private function setupStorage(string $appUuid, int $botId, ?array $template): void
+    {
+        if (!$template) return;
+
+        // Configurar start_command para bots framework (sobreescribe CMD del contenedor)
+        if (!empty($template['start_command'])) {
+            CoolifyAPI::updateApplication($appUuid, [
+                'start_command' => $template['start_command'],
+            ]);
+        }
+
+        // Crear volumen persistente si la plantilla lo requiere
+        if (!empty($template['needs_storage']) && !empty($template['storage_mount_path'])) {
+            $storageName = 'bot-' . $botId . '-data';
+            CoolifyAPI::createPersistentStorage($appUuid, $template['storage_mount_path'], $storageName);
+        }
+
+        // Inyectar código inicial si es un bot framework
+        if (!empty($template['starter_filename'])) {
+            $starterCode = StarterCode::get($template['slug'] ?? '');
+            if ($starterCode) {
+                CoolifyAPI::createFileStorage($appUuid, '/app/' . $template['starter_filename'], $starterCode);
+            }
+        }
+    }
 
     private function getBot(int $id, int $userId): array
     {

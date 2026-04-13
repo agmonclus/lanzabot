@@ -85,11 +85,24 @@ $platformIcons = ['telegram' => '', 'discord' => '', 'multi' => '', 'other' => '
     </div>
     <?php endif; ?>
 
+    <?php if (!empty($template['docs_first_steps_url'])): ?>
+    <div class="deployed-section">
+        <a href="<?= \App\Core\View::e($template['docs_first_steps_url']) ?>" target="_blank" rel="noopener" class="btn btn-outline">
+            📖 Primeros pasos (documentación oficial) →
+        </a>
+    </div>
+    <?php endif; ?>
+
     <!-- Acciones -->
     <div class="deployed-actions">
         <a href="<?= APP_URL ?>/bots/<?= $bot['id'] ?>" class="btn btn-primary btn-lg">
             Ir al panel del bot
         </a>
+        <?php if (!empty($template['starter_filename'])): ?>
+        <a href="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/files" class="btn btn-outline btn-lg">
+            📁 Gestor de Archivos
+        </a>
+        <?php endif; ?>
         <a href="<?= APP_URL ?>/bots/create" class="btn btn-outline">
             Instalar otro bot
         </a>

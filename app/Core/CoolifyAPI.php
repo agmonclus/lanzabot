@@ -181,6 +181,66 @@ class CoolifyAPI
         return self::request('GET', '/applications/' . $uuid);
     }
 
+    // ---- Application update ----
+
+    public static function updateApplication(string $uuid, array $data): array
+    {
+        return self::request('PATCH', '/applications/' . $uuid, $data);
+    }
+
+    // ---- Storages ----
+
+    /**
+     * Lista todos los storages (persistentes + archivos) de una aplicación.
+     */
+    public static function listStorages(string $appUuid): array
+    {
+        return self::request('GET', '/applications/' . $appUuid . '/storages');
+    }
+
+    /**
+     * Crea un volumen persistente para una aplicación.
+     */
+    public static function createPersistentStorage(string $appUuid, string $mountPath, string $name): array
+    {
+        return self::request('POST', '/applications/' . $appUuid . '/storages', [
+            'name'       => $name,
+            'mount_path' => $mountPath,
+        ]);
+    }
+
+    /**
+     * Crea un file storage (archivo inyectado en el contenedor) para una aplicación.
+     */
+    public static function createFileStorage(string $appUuid, string $mountPath, string $content, bool $isDirectory = false): array
+    {
+        return self::request('POST', '/applications/' . $appUuid . '/storages', [
+            'fs_path'      => $mountPath,
+            'mount_path'   => $mountPath,
+            'content'      => $content,
+            'is_directory'  => $isDirectory,
+        ]);
+    }
+
+    /**
+     * Actualiza el contenido de un file storage existente.
+     */
+    public static function updateFileStorage(string $appUuid, string $storageUuid, string $content): array
+    {
+        return self::request('PATCH', '/applications/' . $appUuid . '/storages', [
+            'uuid'    => $storageUuid,
+            'content' => $content,
+        ]);
+    }
+
+    /**
+     * Elimina un storage (persistente o file) de una aplicación.
+     */
+    public static function deleteStorage(string $appUuid, string $storageUuid): array
+    {
+        return self::request('DELETE', '/applications/' . $appUuid . '/storages/' . $storageUuid);
+    }
+
     // ---- Servers ----
 
     public static function getServers(): array

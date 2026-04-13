@@ -65,6 +65,9 @@ $platformIcons = [
         <a href="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/delete" class="btn btn-sm btn-danger">
             Eliminar
         </a>
+        <?php if ($isDeployed): ?>
+            <a href="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/files" class="btn btn-sm btn-outline">📁 Archivos</a>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -101,8 +104,14 @@ $platformIcons = [
                     <?php if (!empty($template['documentation_url'])): ?>
                         <a href="<?= \App\Core\View::e($template['documentation_url']) ?>" target="_blank" rel="noopener">Documentación</a>
                     <?php endif; ?>
+                    <?php if (!empty($template['docs_first_steps_url'])): ?>
+                        <a href="<?= \App\Core\View::e($template['docs_first_steps_url']) ?>" target="_blank" rel="noopener">📖 Primeros pasos</a>
+                    <?php endif; ?>
                     <?php if (!empty($template['more_info_url'])): ?>
                         <a href="<?= \App\Core\View::e($template['more_info_url']) ?>" target="_blank" rel="noopener" class="btn btn-outline btn-sm">+info</a>
+                    <?php endif; ?>
+                    <?php if ($isDeployed): ?>
+                        <a href="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/files" class="btn btn-outline btn-sm">📁 Gestor de Archivos</a>
                     <?php endif; ?>
                 </div>
             </div>
