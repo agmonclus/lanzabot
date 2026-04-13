@@ -1,7 +1,7 @@
 <?php $pageTitle = 'Planes'; ?>
 <div class="page-header">
     <div>
-        <h1>💎 Planes</h1>
+        <h1>Planes</h1>
         <p class="text-muted">Configuración de planes de suscripción</p>
     </div>
 </div>
@@ -43,9 +43,9 @@
                         <?php endif; ?>
                     </td>
                     <td><?= $p['max_databases'] ?: '—' ?></td>
-                    <td><?= $p['has_redis'] ? '✅' : '—' ?></td>
-                    <td><?= $p['has_backups'] ? '✅' : '—' ?></td>
-                    <td><?= $p['is_active'] ? '✅' : '❌' ?></td>
+                    <td><?= $p['has_redis'] ? '' : '—' ?></td>
+                    <td><?= $p['has_backups'] ? '' : '—' ?></td>
+                    <td><?= $p['is_active'] ? '' : '' ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

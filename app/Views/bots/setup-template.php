@@ -1,9 +1,9 @@
 <?php
 $pageTitle = 'Configurar ' . \App\Core\View::e($template['name']);
 $platformIcons = [
-    'telegram' => '✈️', 'discord' => '🎮', 'slack' => '💬', 'whatsapp' => '📱',
-    'twitch' => '🎮', 'matrix' => '🟢', 'reddit' => '🔶', 'mastodon' => '🐘',
-    'multi' => '🌐', 'other' => '⚙️'
+    'telegram' => '', 'discord' => '', 'slack' => '', 'whatsapp' => '',
+    'twitch' => '', 'matrix' => '', 'reddit' => '', 'mastodon' => '',
+    'multi' => '', 'other' => ''
 ];
 $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanzado'];
 ?>
@@ -24,12 +24,12 @@ $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanza
                 <p class="text-muted"><?= \App\Core\View::e($template['short_description']) ?></p>
                 <div class="setup-meta">
                     <span class="badge badge-platform badge-<?= $template['platform'] ?>">
-                        <?= $platformIcons[$template['platform']] ?? '⚙️' ?> <?= ucfirst($template['platform']) ?>
+                        <?= $platformIcons[$template['platform']] ?? '' ?> <?= ucfirst($template['platform']) ?>
                     </span>
                     <span class="badge badge-info"><?= $diffLabels[$template['difficulty']] ?? $template['difficulty'] ?></span>
                     <span class="badge badge-info">v<?= \App\Core\View::e($template['version'] ?? '1.0.0') ?></span>
                     <?php if (!empty($template['auto_update_supported'])): ?>
-                        <span class="badge badge-success">🔄 Auto-actualizable</span>
+                        <span class="badge badge-success">Auto-actualizable</span>
                     <?php endif; ?>
                 </div>
             </div>
@@ -42,15 +42,18 @@ $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanza
         <?php if (!empty($template['more_info_url'])): ?>
             <div class="setup-tpl-moreinfo">
                 <a href="<?= \App\Core\View::e($template['more_info_url']) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
-                    🔗 Página del fabricante
+                    Página del fabricante
                 </a>
             </div>
         <?php endif; ?>
     </div>
 
-    <!-- Formulario de configuración -->
+    <!-- Formulario de configuración + instrucciones en dos columnas -->
+    <div class="setup-cols">
+
+    <!-- Columna izquierda: formulario -->
     <div class="form-card">
-        <h2 style="margin-bottom:.25rem">⚡ Configuración</h2>
+        <h2 style="margin-bottom:.25rem">Configuración</h2>
         <p class="text-muted" style="margin-bottom:1.25rem">Rellena los datos necesarios para desplegar tu bot</p>
 
         <form method="POST" action="<?= APP_URL ?>/bots/from-template/<?= $template['id'] ?>">
@@ -67,7 +70,7 @@ $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanza
             <hr style="border-color:var(--border);margin:1.25rem 0">
 
             <?php if (!empty($requiredVars)): ?>
-                <h3 style="margin-bottom:1rem">🔑 Variables de configuración</h3>
+                <h3 style="margin-bottom:1rem">Variables de configuración</h3>
                 <?php foreach ($requiredVars as $varDef):
                     $key      = $varDef['key'] ?? '';
                     $label    = $varDef['label'] ?? $key;
@@ -126,29 +129,30 @@ $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanza
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="alert alert-info">
-                    ✨ Esta plantilla no necesita configuración adicional. ¡Solo haz clic en desplegar!
+                    Esta plantilla no necesita configuración adicional. ¡Solo haz clic en desplegar!
                 </div>
             <?php endif; ?>
 
             <?php if (!empty($template['auto_update_supported'])): ?>
             <div class="alert alert-info" style="margin-top:1rem">
-                🔄 <strong>Auto-actualización:</strong> Este bot se mantendrá actualizado automáticamente cuando publiquemos mejoras. Podrás desactivarlo después.
+                <strong>Auto-actualización:</strong> Este bot se mantendrá actualizado automáticamente cuando publiquemos mejoras. Podrás desactivarlo después.
             </div>
             <?php endif; ?>
 
             <div class="form-actions" style="margin-top:1.5rem">
                 <a href="<?= APP_URL ?>/bots/create" class="btn btn-ghost">Cancelar</a>
                 <button type="submit" class="btn btn-primary btn-lg">
-                    🚀 Instalar bot
+                    Instalar bot
                 </button>
             </div>
         </form>
-    </div>
+    </div><!-- /.form-card -->
 
-    <!-- Instrucciones de setup (si existen) -->
+    <!-- Columna derecha: instrucciones y documentación -->
+    <div class="setup-instructions-col">
     <?php if (!empty($template['setup_instructions'])): ?>
     <div class="setup-instructions">
-        <h3>📋 Cómo obtener los datos</h3>
+        <h3>Cómo obtener los datos</h3>
         <div class="setup-steps">
             <?= nl2br(\App\Core\View::e($template['setup_instructions'])) ?>
         </div>
@@ -158,8 +162,11 @@ $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanza
     <?php if (!empty($template['documentation_url'])): ?>
     <p style="margin-top:1rem">
         <a href="<?= \App\Core\View::e($template['documentation_url']) ?>" target="_blank" rel="noopener" class="btn btn-outline btn-sm">
-            📖 Documentación completa →
+            Documentación completa →
         </a>
     </p>
     <?php endif; ?>
+    </div><!-- /.setup-instructions-col -->
+
+    </div><!-- /.setup-cols -->
 </div>

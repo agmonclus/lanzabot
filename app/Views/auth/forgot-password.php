@@ -1,8 +1,8 @@
 <div class="login-page">
     <div class="login-box">
         <div class="login-header">
-            <div class="login-logo">⚡</div>
-            <h1>lanzabot<span>.com</span></h1>
+            <div class="login-logo"></div>
+            <h1>LanzaBot<span>.com</span></h1>
             <p>¿Olvidaste tu contraseña?</p>
         </div>
 

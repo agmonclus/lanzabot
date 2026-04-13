@@ -1,7 +1,7 @@
 <?php $pageTitle = 'Pagos'; ?>
 <div class="page-header">
     <div>
-        <h1>💰 Pagos</h1>
+        <h1>Pagos</h1>
         <p class="text-muted"><?= count($payments) ?> pagos registrados</p>
     </div>
 </div>

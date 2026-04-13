@@ -1,7 +1,7 @@
 <?php $pageTitle = 'Usuarios'; ?>
 <div class="page-header">
     <div>
-        <h1>👥 Usuarios</h1>
+        <h1>Usuarios</h1>
         <p class="text-muted"><?= count($users) ?> usuarios registrados</p>
     </div>
 </div>
@@ -42,7 +42,7 @@
                     </td>
                     <td><span class="badge badge-info"><?= \App\Core\View::e($u['plan_name'] ?? 'Sin plan') ?></span></td>
                     <td><?= $u['bot_count'] ?></td>
-                    <td><?= $u['is_admin'] ? '✅' : '—' ?></td>
+                    <td><?= $u['is_admin'] ? '' : '—' ?></td>
                     <td><?= date('d/m/Y', strtotime($u['created_at'])) ?></td>
                 </tr>
             <?php endforeach; ?>

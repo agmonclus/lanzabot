@@ -1,28 +1,28 @@
 <?php
 $pageTitle = 'Desplegar nuevo bot';
 $platformIcons = [
-    'telegram' => '✈️', 'discord' => '🎮', 'slack' => '💬', 'whatsapp' => '📱',
-    'twitch' => '🎮', 'matrix' => '🟢', 'reddit' => '🔶', 'mastodon' => '🐘',
-    'multi' => '🌐', 'other' => '⚙️'
+    'telegram' => '', 'discord' => '', 'slack' => '', 'whatsapp' => '',
+    'twitch' => '', 'matrix' => '', 'reddit' => '', 'mastodon' => '',
+    'multi' => '', 'other' => ''
 ];
 $categoryLabels = [
-    'ai' => '🧠 IA y Agentes', 'communication' => '📡 Comunicaciones',
-    'finance' => '💰 Finanzas y Comercio', 'moderation' => '🛡️ Moderación y Seguridad',
-    'marketing' => '📢 Marketing y Desarrollo',
+    'ai' => 'IA y Agentes', 'communication' => 'Comunicaciones',
+    'finance' => 'Finanzas y Comercio', 'moderation' => 'Moderación y Seguridad',
+    'marketing' => 'Marketing y Desarrollo',
     // Retrocompat para templates antiguos:
-    'starter' => '🚀 Inicio', 'entertainment' => '🎵 Entretenimiento',
-    'utility' => '🔧 Utilidad', 'ecommerce' => '🛒 Comercio',
-    'commerce' => '🛒 Comercio', 'social' => '📣 Social', 'monitoring' => '📊 Monitoreo',
-    'developer' => '⚙️ Desarrollo', 'gaming' => '🕹️ Gaming',
-    'education' => '📚 Educación', 'security' => '🔐 Seguridad',
-    'productivity' => '⏱️ Productividad'
+    'starter' => 'Inicio', 'entertainment' => 'Entretenimiento',
+    'utility' => 'Utilidad', 'ecommerce' => 'Comercio',
+    'commerce' => 'Comercio', 'social' => 'Social', 'monitoring' => 'Monitoreo',
+    'developer' => 'Desarrollo', 'gaming' => 'Gaming',
+    'education' => 'Educación', 'security' => 'Seguridad',
+    'productivity' => 'Productividad'
 ];
 $diffLabels    = ['easy' => 'Fácil', 'medium' => 'Medio', 'advanced' => 'Avanzado'];
 $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'danger'];
 ?>
 <div class="page-header">
     <div>
-        <h1>🚀 Desplegar nuevo bot</h1>
+        <h1>Desplegar nuevo bot</h1>
         <p class="text-muted">Elige una plantilla, configura tus claves y tendrás tu bot funcionando en minutos</p>
     </div>
 </div>
@@ -44,33 +44,33 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
 
 <!-- Buscador -->
 <div class="tpl-search" style="margin-bottom:1rem">
-    <input type="text" id="templateSearch" class="form-control" placeholder="🔍 Buscar bots por nombre, plataforma o categoría..." style="max-width:500px">
+    <input type="text" id="templateSearch" class="form-control" placeholder="Buscar bots por nombre, plataforma o categoría..." style="max-width:500px">
 </div>
 
 <!-- Filtros por plataforma -->
 <div style="margin-bottom:.5rem"><small class="text-muted"><strong>Plataforma:</strong></small></div>
 <div class="tpl-filters" id="platformFilters">
     <button class="tpl-filter active" data-filter="all" data-type="platform">Todas</button>
-    <button class="tpl-filter" data-filter="telegram" data-type="platform">✈️ Telegram</button>
-    <button class="tpl-filter" data-filter="discord" data-type="platform">🎮 Discord</button>
-    <button class="tpl-filter" data-filter="slack" data-type="platform">💬 Slack</button>
-    <button class="tpl-filter" data-filter="whatsapp" data-type="platform">📱 WhatsApp</button>
-    <button class="tpl-filter" data-filter="twitch" data-type="platform">🎮 Twitch</button>
-    <button class="tpl-filter" data-filter="reddit" data-type="platform">🔶 Reddit</button>
-    <button class="tpl-filter" data-filter="mastodon" data-type="platform">🐘 Mastodon</button>
-    <button class="tpl-filter" data-filter="matrix" data-type="platform">🟢 Matrix</button>
-    <button class="tpl-filter" data-filter="multi" data-type="platform">🌐 Multi</button>
+    <button class="tpl-filter" data-filter="telegram" data-type="platform">Telegram</button>
+    <button class="tpl-filter" data-filter="discord" data-type="platform">Discord</button>
+    <button class="tpl-filter" data-filter="slack" data-type="platform">Slack</button>
+    <button class="tpl-filter" data-filter="whatsapp" data-type="platform">WhatsApp</button>
+    <button class="tpl-filter" data-filter="twitch" data-type="platform">Twitch</button>
+    <button class="tpl-filter" data-filter="reddit" data-type="platform">Reddit</button>
+    <button class="tpl-filter" data-filter="mastodon" data-type="platform">Mastodon</button>
+    <button class="tpl-filter" data-filter="matrix" data-type="platform">Matrix</button>
+    <button class="tpl-filter" data-filter="multi" data-type="platform">Multi</button>
 </div>
 
 <!-- Filtros por funcionalidad -->
 <div style="margin-bottom:.5rem"><small class="text-muted"><strong>Funcionalidad:</strong></small></div>
 <div class="tpl-filters" id="categoryFilters">
     <button class="tpl-filter active" data-filter="all" data-type="category">Todas</button>
-    <button class="tpl-filter" data-filter="ai" data-type="category">🧠 IA y Agentes</button>
-    <button class="tpl-filter" data-filter="communication" data-type="category">📡 Comunicaciones</button>
-    <button class="tpl-filter" data-filter="finance" data-type="category">💰 Finanzas y Comercio</button>
-    <button class="tpl-filter" data-filter="moderation" data-type="category">🛡️ Moderación y Seguridad</button>
-    <button class="tpl-filter" data-filter="marketing" data-type="category">📢 Marketing y Desarrollo</button>
+    <button class="tpl-filter" data-filter="ai" data-type="category">IA y Agentes</button>
+    <button class="tpl-filter" data-filter="communication" data-type="category">Comunicaciones</button>
+    <button class="tpl-filter" data-filter="finance" data-type="category">Finanzas y Comercio</button>
+    <button class="tpl-filter" data-filter="moderation" data-type="category">Moderación y Seguridad</button>
+    <button class="tpl-filter" data-filter="marketing" data-type="category">Marketing y Desarrollo</button>
 </div>
 
 <!-- Catálogo de plantillas -->
@@ -91,12 +91,9 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
         <div class="tpl-card-head">
             <span class="tpl-icon"><?= $t['icon'] ?></span>
             <div class="tpl-badges">
-                <span class="badge badge-platform badge-<?= $platform ?>"><?= $platformIcons[$platform] ?? '⚙️' ?> <?= ucfirst($platform) ?></span>
+                <span class="badge badge-platform badge-<?= $platform ?>"><?= $platformIcons[$platform] ?? '' ?> <?= ucfirst($platform) ?></span>
                 <span class="badge badge-category"><?= $categoryLabels[$category] ?? ucfirst($category) ?></span>
                 <span class="badge badge-<?= $diffColors[$t['difficulty']] ?? 'info' ?>"><?= $diffLabels[$t['difficulty']] ?? $t['difficulty'] ?></span>
-                <?php if ($autoUpdate): ?>
-                    <span class="badge badge-info" title="Se actualiza automáticamente">🔄 Auto</span>
-                <?php endif; ?>
             </div>
         </div>
         <div class="tpl-card-body">
@@ -113,11 +110,11 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
         <div class="tpl-card-footer">
             <?php if ($available): ?>
                 <a href="<?= APP_URL ?>/bots/from-template/<?= $t['id'] ?>" class="btn btn-primary btn-full">
-                    ⚡ Instalar en 1 clic
+                    Instalar ahora
                 </a>
             <?php elseif (!$planOk): ?>
                 <a href="<?= APP_URL ?>/plans" class="btn btn-outline btn-full">
-                    🔒 Requiere plan <?= ucfirst($t['min_plan_slug']) ?>
+                    Requiere plan <?= ucfirst($t['min_plan_slug']) ?>
                 </a>
             <?php else: ?>
                 <span class="btn btn-ghost btn-full" style="cursor:default">
@@ -126,7 +123,7 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
             <?php endif; ?>
             <?php if (!empty($t['more_info_url'])): ?>
                 <a href="<?= \App\Core\View::e($t['more_info_url']) ?>" target="_blank" rel="noopener" class="btn btn-outline btn-full" style="margin-top:.4rem">
-                    ℹ️ +info
+                    +info
                 </a>
             <?php endif; ?>
         </div>
@@ -139,7 +136,7 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
 
 <?php if (empty($templates)): ?>
 <div class="empty-state">
-    <div class="empty-icon">🤖</div>
+    <div class="empty-icon"></div>
     <p>No hay plantillas disponibles por el momento.</p>
 </div>
 <?php endif; ?>
@@ -147,7 +144,7 @@ $diffColors    = ['easy' => 'success', 'medium' => 'warning', 'advanced' => 'dan
 <!-- Info de ayuda -->
 <div style="text-align:center; margin-top:2rem; padding:1.5rem; border:1px solid var(--border); border-radius:12px;">
     <p style="margin:0 0 .5rem">¿Necesitas ayuda eligiendo un bot?</p>
-    <a href="<?= APP_URL ?>/help" class="btn btn-outline btn-sm">📖 Ver guía de ayuda</a>
+    <a href="<?= APP_URL ?>/help" class="btn btn-outline btn-sm">Ver guía de ayuda</a>
 </div>
 
 <script>

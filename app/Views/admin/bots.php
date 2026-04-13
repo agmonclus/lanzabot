@@ -1,7 +1,7 @@
 <?php $pageTitle = 'Bots'; ?>
 <div class="page-header">
     <div>
-        <h1>🤖 Bots</h1>
+        <h1>Bots</h1>
         <p class="text-muted"><?= count($bots) ?> bots desplegados</p>
     </div>
 </div>
@@ -27,8 +27,8 @@
                     <td>#<?= $b['id'] ?></td>
                     <td><?= \App\Core\View::e($b['name']) ?></td>
                     <td>
-                        <?php $icons = ['telegram' => '✈️', 'discord' => '🎮', 'other' => '⚙️']; ?>
-                        <?= $icons[$b['platform']] ?? '⚙️' ?> <?= \App\Core\View::e($b['platform']) ?>
+                        <?php $icons = ['telegram' => '', 'discord' => '', 'other' => '']; ?>
+                        <?= $icons[$b['platform']] ?? '' ?> <?= \App\Core\View::e($b['platform']) ?>
                     </td>
                     <td>
                         <?= \App\Core\View::e($b['user_name']) ?>
@@ -40,7 +40,7 @@
                             <?= \App\Core\View::e($b['coolify_status'] ?? 'stopped') ?>
                         </span>
                     </td>
-                    <td><?= $b['code_uploaded'] ? '✅' : '❌' ?></td>
+                    <td><?= $b['code_uploaded'] ? '' : '' ?></td>
                     <td><?= date('d/m/Y', strtotime($b['created_at'])) ?></td>
                 </tr>
             <?php endforeach; ?>

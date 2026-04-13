@@ -1,15 +1,15 @@
 <?php
 $pageTitle = 'Dashboard';
 $platformIcons = [
-    'telegram' => '✈️', 'discord' => '🎮', 'slack' => '💬', 'whatsapp' => '📱',
-    'twitch' => '🎮', 'matrix' => '🟢', 'reddit' => '🔶', 'mastodon' => '🐘',
-    'multi' => '🌐', 'other' => '⚙️'
+    'telegram' => '', 'discord' => '', 'slack' => '', 'whatsapp' => '',
+    'twitch' => '', 'matrix' => '', 'reddit' => '', 'mastodon' => '',
+    'multi' => '', 'other' => ''
 ];
 ?>
 <div class="page-header">
     <div>
         <h1>Dashboard</h1>
-        <p class="text-muted">Hola, <?= \App\Core\View::e(explode(' ', $user['name'])[0]) ?> 👋</p>
+        <p class="text-muted">Hola, <?= \App\Core\View::e(explode(' ', $user['name'])[0]) ?> </p>
     </div>
     <a href="<?= APP_URL ?>/bots/create" class="btn btn-primary">
         <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
@@ -43,7 +43,7 @@ $platformIcons = [
 
     <?php if (empty($bots)): ?>
     <div class="empty-state">
-        <div class="empty-icon">🤖</div>
+        <div class="empty-icon"></div>
         <p>Aún no tienes bots. ¡Despliega el primero en menos de un minuto!</p>
         <a href="<?= APP_URL ?>/bots/create" class="btn btn-primary">Desplegar bot</a>
     </div>
@@ -52,7 +52,7 @@ $platformIcons = [
         <?php foreach ($bots as $bot): ?>
         <a href="<?= APP_URL ?>/bots/<?= $bot['id'] ?>" class="bot-card">
             <div class="bot-card-header">
-                <span class="bot-platform <?= $bot['platform'] ?>"><?= $platformIcons[$bot['platform']] ?? '🤖' ?></span>
+                <span class="bot-platform <?= $bot['platform'] ?>"><?= $platformIcons[$bot['platform']] ?? '' ?></span>
                 <span class="bot-status status-<?= \App\Core\View::e($bot['coolify_status'] ?? 'stopped') ?>">
                     <?= \App\Core\View::e($bot['coolify_status'] ?? 'stopped') ?>
                 </span>

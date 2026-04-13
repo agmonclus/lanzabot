@@ -68,7 +68,7 @@ $t           = $template ?? [];
             </div>
             <div class="form-group" style="width:80px">
                 <label for="icon">Icono</label>
-                <input type="text" id="icon" name="icon" class="form-control" value="<?= \App\Core\View::e($t['icon'] ?? '🤖') ?>" maxlength="10" style="text-align:center;font-size:1.3rem">
+                <input type="text" id="icon" name="icon" class="form-control" value="<?= \App\Core\View::e($t['icon'] ?? '') ?>" maxlength="10" style="text-align:center;font-size:1.3rem">
             </div>
         </div>
 
@@ -147,11 +147,11 @@ $t           = $template ?? [];
             <div class="form-group" style="display:flex;align-items:center;gap:1.5rem;padding-top:1.5rem">
                 <label class="toggle-label">
                     <input type="checkbox" name="is_featured" <?= !empty($t['is_featured']) ? 'checked' : '' ?>>
-                    <span>⭐ Destacada</span>
+                    <span>Destacada</span>
                 </label>
                 <label class="toggle-label">
                     <input type="checkbox" name="is_active" <?= ($t['is_active'] ?? 1) ? 'checked' : '' ?>>
-                    <span>✅ Activa</span>
+                    <span>Activa</span>
                 </label>
             </div>
         </div>

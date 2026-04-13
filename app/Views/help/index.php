@@ -2,29 +2,29 @@
 $pageTitle = 'Centro de ayuda';
 
 $platformInfo = [
-    'telegram'  => ['icon' => '✈️', 'name' => 'Telegram',  'color' => '#0088cc'],
-    'discord'   => ['icon' => '🎮', 'name' => 'Discord',   'color' => '#5865F2'],
-    'slack'     => ['icon' => '💬', 'name' => 'Slack',      'color' => '#4A154B'],
-    'whatsapp'  => ['icon' => '📱', 'name' => 'WhatsApp',   'color' => '#25D366'],
-    'twitch'    => ['icon' => '🎮', 'name' => 'Twitch',     'color' => '#9146FF'],
-    'matrix'    => ['icon' => '🟢', 'name' => 'Matrix',     'color' => '#0DBD8B'],
-    'reddit'    => ['icon' => '🔶', 'name' => 'Reddit',     'color' => '#FF4500'],
-    'mastodon'  => ['icon' => '🐘', 'name' => 'Mastodon',   'color' => '#6364FF'],
-    'multi'     => ['icon' => '🌐', 'name' => 'Multi-plataforma', 'color' => '#667'],
-    'other'     => ['icon' => '⚙️', 'name' => 'Otro',       'color' => '#667'],
+    'telegram'  => ['icon' => '', 'name' => 'Telegram',  'color' => '#0088cc'],
+    'discord'   => ['icon' => '', 'name' => 'Discord',   'color' => '#5865F2'],
+    'slack'     => ['icon' => '', 'name' => 'Slack',      'color' => '#4A154B'],
+    'whatsapp'  => ['icon' => '', 'name' => 'WhatsApp',   'color' => '#25D366'],
+    'twitch'    => ['icon' => '', 'name' => 'Twitch',     'color' => '#9146FF'],
+    'matrix'    => ['icon' => '', 'name' => 'Matrix',     'color' => '#0DBD8B'],
+    'reddit'    => ['icon' => '', 'name' => 'Reddit',     'color' => '#FF4500'],
+    'mastodon'  => ['icon' => '', 'name' => 'Mastodon',   'color' => '#6364FF'],
+    'multi'     => ['icon' => '', 'name' => 'Multi-plataforma', 'color' => '#667'],
+    'other'     => ['icon' => '', 'name' => 'Otro',       'color' => '#667'],
 ];
 ?>
 
 <div class="page-header">
     <div>
-        <h1>📖 Centro de ayuda</h1>
+        <h1>Centro de ayuda</h1>
         <p class="text-muted">Todo lo que necesitas para empezar con tus bots</p>
     </div>
 </div>
 
 <!-- Guía rápida -->
 <section class="section">
-    <h2>🚀 Cómo funciona Lanzabot</h2>
+    <h2>Cómo funciona LanzaBot</h2>
     <div class="help-steps-grid">
         <div class="help-step-card">
             <div class="help-step-number">1</div>
@@ -46,7 +46,7 @@ $platformInfo = [
 
 <!-- FAQ -->
 <section class="section">
-    <h2>❓ Preguntas frecuentes</h2>
+    <h2>Preguntas frecuentes</h2>
     <div class="help-faq">
         <details class="faq-item">
             <summary>¿Necesito saber programar?</summary>
@@ -85,7 +85,7 @@ $platformInfo = [
 
 <!-- Guías por plataforma -->
 <section class="section">
-    <h2>📋 Guías por plataforma</h2>
+    <h2>Guías por plataforma</h2>
     <p class="text-muted" style="margin-bottom:1.25rem">Aprende cómo obtener las credenciales necesarias para cada plataforma</p>
 
     <div class="help-platform-grid">
@@ -107,7 +107,7 @@ $platformInfo = [
                         <li>Abre Telegram y busca <strong>@BotFather</strong></li>
                         <li>Envía <code>/newbot</code> y sigue las instrucciones</li>
                         <li>Copia el <strong>token</strong> que te proporciona (formato: <code>123456:ABC-DEF...</code>)</li>
-                        <li>Pega el token al instalar cualquier bot de Telegram en Lanzabot</li>
+                        <li>Pega el token al instalar cualquier bot de Telegram en LanzaBot</li>
                     </ol>
                 <?php elseif ($slug === 'discord'): ?>
                     <ol>
@@ -181,7 +181,7 @@ $platformInfo = [
     <h2>¿Tienes más dudas?</h2>
     <p class="text-muted" style="margin-bottom:1rem">Estamos aquí para ayudarte</p>
     <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-        <a href="<?= APP_URL ?>/bots/create" class="btn btn-primary">🚀 Instalar un bot</a>
-        <a href="<?= APP_URL ?>/plans" class="btn btn-outline">📋 Ver planes</a>
+        <a href="<?= APP_URL ?>/bots/create" class="btn btn-primary">Instalar un bot</a>
+        <a href="<?= APP_URL ?>/plans" class="btn btn-outline">Ver planes</a>
     </div>
 </section>

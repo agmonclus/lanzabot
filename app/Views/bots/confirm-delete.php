@@ -1,11 +1,11 @@
 <?php
 $pageTitle = 'Eliminar bot: ' . $bot['name'];
 $platformIcons = [
-    'telegram' => '✈️', 'discord' => '🎮', 'slack' => '💬', 'whatsapp' => '📱',
-    'twitch' => '🎮', 'matrix' => '🟢', 'reddit' => '🔶', 'mastodon' => '🐘',
-    'multi' => '🌐', 'other' => '⚙️'
+    'telegram' => '', 'discord' => '', 'slack' => '', 'whatsapp' => '',
+    'twitch' => '', 'matrix' => '', 'reddit' => '', 'mastodon' => '',
+    'multi' => '', 'other' => ''
 ];
-$icon = $platformIcons[$bot['platform']] ?? '🤖';
+$icon = $platformIcons[$bot['platform']] ?? '';
 ?>
 
 <div class="page-header">
@@ -18,7 +18,7 @@ $icon = $platformIcons[$bot['platform']] ?? '🤖';
 <div style="max-width: 560px; margin: 2rem auto;">
     <div class="card" style="border: 2px solid var(--danger, #e53e3e);">
         <div class="card-body" style="padding: 2rem; text-align: center;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+            <div style="font-size: 3rem; margin-bottom: 1rem;"></div>
 
             <h2 style="margin: 0 0 .5rem; color: var(--danger, #e53e3e);">
                 ¿Eliminar este bot?

@@ -1,15 +1,15 @@
 <?php $pageTitle = 'Panel de Administración'; ?>
 <div class="page-header">
     <div>
-        <h1>⚙️ Panel de Administración</h1>
-        <p class="text-muted">Resumen general de Lanzabot</p>
+        <h1>Panel de Administración</h1>
+        <p class="text-muted">Resumen general de LanzaBot</p>
     </div>
 </div>
 
 <!-- Stats cards -->
 <div class="admin-stats-grid">
     <div class="stat-card">
-        <div class="stat-card-icon">👥</div>
+        <div class="stat-card-icon"></div>
         <div class="stat-card-data">
             <div class="stat-card-number"><?= $stats['total_users'] ?></div>
             <div class="stat-card-label">Usuarios totales</div>
@@ -17,7 +17,7 @@
         <div class="stat-card-extra">+<?= $stats['users_today'] ?> hoy</div>
     </div>
     <div class="stat-card">
-        <div class="stat-card-icon">🤖</div>
+        <div class="stat-card-icon"></div>
         <div class="stat-card-data">
             <div class="stat-card-number"><?= $stats['total_bots'] ?></div>
             <div class="stat-card-label">Bots creados</div>
@@ -25,14 +25,14 @@
         <div class="stat-card-extra"><?= $stats['running_bots'] ?> activos</div>
     </div>
     <div class="stat-card">
-        <div class="stat-card-icon">📦</div>
+        <div class="stat-card-icon"></div>
         <div class="stat-card-data">
             <div class="stat-card-number"><?= $stats['total_templates'] ?></div>
             <div class="stat-card-label">Plantillas</div>
         </div>
     </div>
     <div class="stat-card">
-        <div class="stat-card-icon">💳</div>
+        <div class="stat-card-icon"></div>
         <div class="stat-card-data">
             <div class="stat-card-number"><?= $stats['active_subs'] ?></div>
             <div class="stat-card-label">Suscripciones de pago</div>
@@ -40,7 +40,7 @@
         <div class="stat-card-extra"><?= $stats['free_subs'] ?> gratuitas</div>
     </div>
     <div class="stat-card">
-        <div class="stat-card-icon">💰</div>
+        <div class="stat-card-icon"></div>
         <div class="stat-card-data">
             <div class="stat-card-number"><?= number_format($stats['total_revenue'] / 100, 2) ?> €</div>
             <div class="stat-card-label">Ingresos totales</div>

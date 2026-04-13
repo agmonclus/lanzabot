@@ -6,16 +6,16 @@ $subtitles = [
     'medium'  => 'Potencia Total',
     'pro'     => 'La Central de Bots',
 ];
-$planEmojis = ['free' => '🥚', 'starter' => '🌱', 'medium' => '🚀', 'pro' => '👑'];
+$planEmojis = ['free' => '', 'starter' => '', 'medium' => '', 'pro' => ''];
 $highlights = [
-    'free'    => '🍃 <strong>Modo Eco (Hibernación):</strong> Si tu bot no tiene actividad o no visitas el panel en 7 días, entrará en "Modo Eco". ¿Quieres volver? Dale a <em>Despertar</em> desde el panel y estará online en segundos.',
-    'starter' => '💾 <strong>Disco Permanente:</strong> Toda la información que tu bot guarde (SQLite, archivos JSON, niveles de usuarios) sobrevivirá a cualquier reinicio o actualización.',
-    'medium'  => '🚀 <strong>Rendimiento Garantizado:</strong> Con almacenamiento de alta velocidad y mayor memoria, tus bots responderán de forma instantánea incluso en horas pico.',
-    'pro'     => '🏗️ <strong>Infraestructura de Élite:</strong> El plan más robusto para quienes necesitan máxima persistencia, sistemas complejos con bases de datos pesadas o grandes volúmenes de caché.',
+    'free'    => '<strong>Modo Eco (Hibernación):</strong> Si tu bot no tiene actividad o no visitas el panel en 7 días, entrará en "Modo Eco". ¿Quieres volver? Dale a <em>Despertar</em> desde el panel y estará online en segundos.',
+    'starter' => '<strong>Disco Permanente:</strong> Toda la información que tu bot guarde (SQLite, archivos JSON, niveles de usuarios) sobrevivirá a cualquier reinicio o actualización.',
+    'medium'  => '<strong>Rendimiento Garantizado:</strong> Con almacenamiento de alta velocidad y mayor memoria, tus bots responderán de forma instantánea incluso en horas pico.',
+    'pro'     => '<strong>Infraestructura de Élite:</strong> El plan más robusto para quienes necesitan máxima persistencia, sistemas complejos con bases de datos pesadas o grandes volúmenes de caché.',
 ];
 ?>
 <div class="page-header">
-    <h1>💎 Planes de Alojamiento</h1>
+    <h1>Planes de Alojamiento</h1>
     <p class="text-muted">Sin permanencia. Cancela cuando quieras.</p>
 </div>
 
@@ -38,23 +38,23 @@ $highlights = [
         <?php endif; ?>
     </div>
     <ul class="plan-features">
-        <li>✓ <?= $plan['max_bots'] ?> bot<?= $plan['max_bots'] > 1 ? 's (Slots)' : '' ?></li>
-        <li>✓ <?= $plan['ram_mb'] >= 1024 ? number_format($plan['ram_mb'] / 1024, 1) . ' GB' : $plan['ram_mb'] . ' MB' ?> RAM</li>
+        <li><?= $plan['max_bots'] ?> bot<?= $plan['max_bots'] > 1 ? 's (Slots)' : '' ?></li>
+        <li><?= $plan['ram_mb'] >= 1024 ? number_format($plan['ram_mb'] / 1024, 1) . ' GB' : $plan['ram_mb'] . ' MB' ?> RAM</li>
         <?php if ($plan['disk_gb'] > 0): ?>
-            <li>✓ <?= $plan['disk_gb'] ?> GB Disco Permanente</li>
+            <li><?= $plan['disk_gb'] ?> GB Disco Permanente</li>
         <?php elseif ($plan['disk_temp_mb'] > 0): ?>
-            <li>✓ <?= $plan['disk_temp_mb'] ?> MB Disco Temporal</li>
+            <li><?= $plan['disk_temp_mb'] ?> MB Disco Temporal</li>
         <?php else: ?>
             <li class="text-muted">– Sin disco</li>
         <?php endif; ?>
         <?php if ($plan['max_databases'] > 0): ?>
-            <li>✓ <?= $plan['max_databases'] ?> base<?= $plan['max_databases'] > 1 ? 's' : '' ?> de datos</li>
+            <li><?= $plan['max_databases'] ?> base<?= $plan['max_databases'] > 1 ? 's' : '' ?> de datos</li>
         <?php else: ?>
             <li class="text-muted">– Sin base de datos</li>
         <?php endif; ?>
-        <?php if ($plan['has_redis']): ?><li>✓ Redis (caché ultra rápida)</li><?php endif; ?>
-        <?php if ($plan['has_backups']): ?><li>✓ Backups automáticos</li><?php endif; ?>
-        <?php if (in_array($plan['slug'], ['medium', 'pro'])): ?><li>✓ Soporte prioritario</li><?php endif; ?>
+        <?php if ($plan['has_redis']): ?><li>Redis (caché ultra rápida)</li><?php endif; ?>
+        <?php if ($plan['has_backups']): ?><li>Backups automáticos</li><?php endif; ?>
+        <?php if (in_array($plan['slug'], ['medium', 'pro'])): ?><li>Soporte prioritario</li><?php endif; ?>
     </ul>
     <?php if (isset($highlights[$plan['slug']])): ?>
     <div class="plan-highlight">
@@ -78,7 +78,7 @@ $highlights = [
 
 <!-- FAQ / Glosario -->
 <div class="faq-section">
-    <h2>🧐 Preguntas frecuentes</h2>
+    <h2>Preguntas frecuentes</h2>
     <div class="faq-grid">
         <div class="faq-item">
             <h4>¿Qué es el Disco Temporal (Plan Free)?</h4>

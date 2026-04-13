@@ -1,7 +1,7 @@
 <?php $pageTitle = 'Plantillas de Bots'; ?>
 <div class="page-header">
     <div>
-        <h1>📦 Plantillas de Bots</h1>
+        <h1>Plantillas de Bots</h1>
         <p class="text-muted"><?= count($templates) ?> plantillas</p>
     </div>
     <a href="<?= APP_URL ?>/admin/templates/create" class="btn btn-primary">+ Nueva plantilla</a>
@@ -32,8 +32,8 @@
                         <br><small class="text-muted"><?= \App\Core\View::e($t['slug']) ?></small>
                     </td>
                     <td>
-                        <?php $pIcons = ['telegram' => '✈️', 'discord' => '🎮', 'multi' => '🌐', 'other' => '⚙️']; ?>
-                        <?= $pIcons[$t['platform']] ?? '⚙️' ?> <?= \App\Core\View::e($t['platform']) ?>
+                        <?php $pIcons = ['telegram' => '', 'discord' => '', 'multi' => '', 'other' => '']; ?>
+                        <?= $pIcons[$t['platform']] ?? '' ?> <?= \App\Core\View::e($t['platform']) ?>
                     </td>
                     <td><span class="badge"><?= \App\Core\View::e($t['category']) ?></span></td>
                     <td>
@@ -41,8 +41,8 @@
                         <span class="badge badge-<?= $diffColors[$t['difficulty']] ?? 'info' ?>"><?= \App\Core\View::e($t['difficulty']) ?></span>
                     </td>
                     <td><code><?= \App\Core\View::e($t['min_plan_slug']) ?></code></td>
-                    <td><?= $t['is_featured'] ? '⭐' : '—' ?></td>
-                    <td><?= $t['is_active'] ? '✅' : '❌' ?></td>
+                    <td><?= $t['is_featured'] ? '' : '—' ?></td>
+                    <td><?= $t['is_active'] ? '' : '' ?></td>
                     <td>
                         <div style="display:flex;gap:.3rem">
                             <a href="<?= APP_URL ?>/admin/templates/<?= $t['id'] ?>/edit" class="btn btn-xs btn-outline">Editar</a>

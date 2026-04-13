@@ -325,7 +325,7 @@ code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: .85em; backgro
 .stat-row:last-child { border-bottom: none; }
 
 /* ---- Forms ---- */
-.form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; max-width: 540px; box-shadow: var(--shadow); }
+.form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; box-shadow: var(--shadow); }
 .form-group { margin-bottom: 1rem; }
 .form-group label { display: block; font-size: .84rem; font-weight: 500; margin-bottom: .35rem; color: #495057; }
 .form-control {
@@ -711,8 +711,9 @@ textarea.form-control { resize: vertical; }
    Setup Template — /bots/from-template/{id}
    ============================================================ */
 
-.setup-container { max-width: 700px; margin: 0 auto; }
+.setup-container { }
 .setup-tpl-info { margin-bottom: 1.5rem; }
+.setup-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
 .setup-tpl-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: .75rem; }
 .tpl-icon-lg { font-size: 3rem; line-height: 1; }
 .setup-tpl-header h1 { font-size: 1.5rem; margin-bottom: .15rem; }
@@ -724,7 +725,7 @@ textarea.form-control { resize: vertical; }
 .setup-tpl-moreinfo { margin-top: .75rem; }
 .setup-instructions {
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 1.25rem; margin-top: 1.5rem;
+    padding: 1.25rem;
 }
 .setup-instructions h3 { margin-bottom: .75rem; }
 .setup-steps { font-size: .88rem; line-height: 1.7; color: var(--text); white-space: pre-line; }
@@ -770,6 +771,10 @@ textarea.form-control { resize: vertical; }
 /* Alert */
 .alert { padding: .75rem 1rem; border-radius: var(--radius); font-size: .88rem; }
 .alert-info { background: var(--accent-lt); color: var(--accent); border: 1px solid #b6d4fe; }
+
+@media (max-width: 900px) {
+    .setup-cols { grid-template-columns: 1fr; }
+}
 
 @media (max-width: 600px) {
     .tpl-grid { grid-template-columns: 1fr; }

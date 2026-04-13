@@ -1,7 +1,7 @@
 <?php $pageTitle = 'Suscripciones'; ?>
 <div class="page-header">
     <div>
-        <h1>📋 Suscripciones</h1>
+        <h1>Suscripciones</h1>
         <p class="text-muted"><?= count($subs) ?> suscripciones</p>
     </div>
 </div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= isset($pageTitle) ? \App\Core\View::e($pageTitle) . ' &mdash; ' : '' ?>Lanzabot</title>
+    <title><?= isset($pageTitle) ? \App\Core\View::e($pageTitle) . ' &mdash; ' : '' ?>LanzaBot</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="<?= APP_URL ?>/assets/css/style.css">
@@ -14,8 +14,8 @@
     <aside class="sidebar">
         <div class="sidebar-brand">
             <a href="<?= APP_URL ?>/dashboard">
-                <span class="brand-icon">⚡</span>
-                <span class="brand-name">lanzabot</span>
+                <span class="brand-icon"></span>
+                <span class="brand-name">LanzaBot</span>
             </a>
         </div>
 
