@@ -92,6 +92,31 @@ class CoolifyAPI
         return $result;
     }
 
+    /**
+     * Crea una aplicación desde un Dockerfile inline (base64).
+     * Usado para bots framework que necesitan instalar dependencias y ejecutar código propio.
+     */
+    public static function createDockerfileApplication(string $botName, string $dockerfileContent, array $envVars = [], int $ramMb = 128): array
+    {
+        $result = self::request('POST', '/applications/dockerfile', [
+            'project_uuid'     => COOLIFY_PROJECT_UUID,
+            'server_uuid'      => COOLIFY_SERVER_UUID,
+            'environment_name' => 'production',
+            'name'             => 'bot-' . $botName,
+            'dockerfile'       => base64_encode($dockerfileContent),
+            'ports_exposes'    => '8080',
+            'instant_deploy'   => false,
+            'limits_memory'    => $ramMb . 'm',
+            'limits_cpus'      => '0.5',
+        ]);
+
+        if (!empty($result['uuid']) && !empty($envVars)) {
+            self::updateEnvVars($result['uuid'], $envVars);
+        }
+
+        return $result;
+    }
+
     public static function createPublicApplication(string $botName, string $gitRepoUrl, array $envVars = [], int $ramMb = 128, string $buildPack = 'nixpacks', string $gitBranch = 'main', ?string $installCommand = null): array
     {
         $payload = [
@@ -129,17 +154,17 @@ class CoolifyAPI
 
     public static function startApplication(string $uuid): array
     {
-        return self::request('GET', '/applications/' . $uuid . '/start');
+        return self::request('POST', '/applications/' . $uuid . '/start');
     }
 
     public static function stopApplication(string $uuid): array
     {
-        return self::request('GET', '/applications/' . $uuid . '/stop');
+        return self::request('POST', '/applications/' . $uuid . '/stop');
     }
 
     public static function restartApplication(string $uuid): array
     {
-        return self::request('GET', '/applications/' . $uuid . '/restart');
+        return self::request('POST', '/applications/' . $uuid . '/restart');
     }
 
     public static function deleteApplication(string $uuid): array
@@ -163,7 +188,7 @@ class CoolifyAPI
 
     public static function deploy(string $uuid): array
     {
-        return self::request('GET', '/applications/' . $uuid . '/deploy');
+        return self::request('GET', '/deploy?uuid=' . $uuid);
     }
 
     public static function getDeployments(string $appUuid): array
@@ -204,6 +229,7 @@ class CoolifyAPI
     public static function createPersistentStorage(string $appUuid, string $mountPath, string $name): array
     {
         return self::request('POST', '/applications/' . $appUuid . '/storages', [
+            'type'       => 'persistent',
             'name'       => $name,
             'mount_path' => $mountPath,
         ]);
@@ -215,9 +241,10 @@ class CoolifyAPI
     public static function createFileStorage(string $appUuid, string $mountPath, string $content, bool $isDirectory = false): array
     {
         return self::request('POST', '/applications/' . $appUuid . '/storages', [
-            'fs_path'      => $mountPath,
-            'mount_path'   => $mountPath,
-            'content'      => $content,
+            'type'          => 'file',
+            'fs_path'       => $mountPath,
+            'mount_path'    => $mountPath,
+            'content'       => $content,
             'is_directory'  => $isDirectory,
         ]);
     }

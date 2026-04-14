@@ -143,12 +143,17 @@ class BotController
             $slug  = preg_replace('/[^a-z0-9]/', '-', strtolower($botName)) . '-' . $botId;
 
             // Si el template tiene repositorio git, desplegar desde repo público;
+            // si tiene start_command (framework), desplegar con Dockerfile inline;
             // si no, desplegar como imagen Docker directa (ej. n8nio/n8n:latest)
             $gitRepoUrl     = $template['git_repo_url'] ?? null;
             $gitBranch      = $template['git_branch'] ?? 'main';
             $installCommand = $template['install_command'] ?? null;
+            $startCommand   = $template['start_command'] ?? null;
             if (!empty($gitRepoUrl)) {
                 $result = CoolifyAPI::createPublicApplication($slug, $gitRepoUrl, $envVars, $ramMb, 'nixpacks', $gitBranch, $installCommand);
+            } elseif (!empty($startCommand)) {
+                $dockerfile = $this->buildFrameworkDockerfile($template);
+                $result = CoolifyAPI::createDockerfileApplication($slug, $dockerfile, $envVars, $ramMb);
             } else {
                 $result = CoolifyAPI::createApplication($slug, $template['docker_image'], $envVars, $ramMb);
             }
@@ -250,15 +255,21 @@ class BotController
                 $gitRepoUrl = null;
                 $gitBranch = 'main';
                 $installCommand = null;
+                $startCommand = null;
+                $tpl = null;
                 if (!empty($bot['template_id'])) {
                     $tpl = BotTemplate::find((int)$bot['template_id']);
                     $gitRepoUrl     = $tpl['git_repo_url'] ?? null;
                     $gitBranch      = $tpl['git_branch'] ?? 'main';
                     $installCommand = $tpl['install_command'] ?? null;
+                    $startCommand   = $tpl['start_command'] ?? null;
                 }
 
                 if (!empty($gitRepoUrl)) {
                     $result = CoolifyAPI::createPublicApplication($slug, $gitRepoUrl, $envVars, $ramMb, 'nixpacks', $gitBranch, $installCommand);
+                } elseif (!empty($startCommand) && $tpl) {
+                    $dockerfile = $this->buildFrameworkDockerfile($tpl);
+                    $result = CoolifyAPI::createDockerfileApplication($slug, $dockerfile, $envVars, $ramMb);
                 } else {
                     $result = CoolifyAPI::createApplication($slug, $bot['docker_image'], $envVars, $ramMb);
                 }
@@ -696,13 +707,6 @@ class BotController
     {
         if (!$template) return;
 
-        // Configurar start_command para bots framework (sobreescribe CMD del contenedor)
-        if (!empty($template['start_command'])) {
-            CoolifyAPI::updateApplication($appUuid, [
-                'start_command' => $template['start_command'],
-            ]);
-        }
-
         // Crear volumen persistente si la plantilla lo requiere
         if (!empty($template['needs_storage']) && !empty($template['storage_mount_path'])) {
             $storageName = 'bot-' . $botId . '-data';
@@ -716,6 +720,24 @@ class BotController
                 CoolifyAPI::createFileStorage($appUuid, '/app/' . $template['starter_filename'], $starterCode);
             }
         }
+    }
+
+    /**
+     * Genera un Dockerfile inline para bots de tipo framework.
+     * Solo define la imagen base, directorio de trabajo y CMD.
+     * El código inicial se inyecta mediante file storage de Coolify.
+     */
+    private function buildFrameworkDockerfile(array $template): string
+    {
+        $image    = $template['docker_image'] ?? 'python:3.11-slim';
+        $startCmd = $template['start_command'];
+
+        $lines = [];
+        $lines[] = 'FROM ' . $image;
+        $lines[] = 'WORKDIR /app';
+        $lines[] = 'CMD ["sh", "-c", ' . json_encode($startCmd, JSON_UNESCAPED_SLASHES) . ']';
+
+        return implode("\n", $lines) . "\n";
     }
 
     private function getBot(int $id, int $userId): array
