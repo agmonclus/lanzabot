@@ -126,8 +126,9 @@ $platformIcons = [
             <div class="card-body">
                 <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/env">
                     <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
-                    <textarea name="env_vars" class="form-control code-editor" rows="8"
-                        placeholder="BOT_TOKEN=tu_token&#10;OTRA_VAR=valor"><?= \App\Core\View::e(trim($envText)) ?></textarea>
+                    <textarea name="env_vars" id="envVarsTextarea" class="form-control code-editor"
+                        placeholder="BOT_TOKEN=tu_token&#10;OTRA_VAR=valor"
+                        style="resize:vertical; overflow:hidden; min-height:4rem;"><?= \App\Core\View::e(trim($envText)) ?></textarea>
                     <small class="form-hint">Una variable por línea en formato CLAVE=VALOR. Los cambios se aplicarán automáticamente al bot en ejecución.</small>
                     <div class="form-actions mt-2">
                         <button type="submit" class="btn btn-sm btn-outline">Guardar variables</button>
@@ -136,57 +137,27 @@ $platformIcons = [
             </div>
         </div>
 
-        <!-- Auto-actualización -->
-        <?php if ($template && !empty($template['auto_update_supported'])): ?>
-        <div class="card">
+        <!-- Logs -->
+        <?php if ($isDeployed): ?>
+        <div class="card card-logs">
             <div class="card-header">
-                <h3>Auto-actualización</h3>
-            </div>
-            <div class="card-body">
-                <div style="display:flex; align-items:center; justify-content:space-between;">
-                    <div>
-                        <p style="margin:0 0 .25rem">
-                            <?php if ($bot['auto_update']): ?>
-                                <span class="badge badge-success">Activada</span>
-                            <?php else: ?>
-                                <span class="badge badge-warning">Desactivada</span>
-                            <?php endif; ?>
-                        </p>
-                        <small class="text-muted">
-                            Cuando hay una nueva versión de la plantilla, tu bot se actualizará automáticamente.
-                            Versión actual: <strong>v<?= \App\Core\View::e($bot['current_version'] ?? '1.0.0') ?></strong>
-                            <?php if (!empty($bot['last_updated_at'])): ?>
-                                · Última actualización: <?= date('d/m/Y H:i', strtotime($bot['last_updated_at'])) ?>
-                            <?php endif; ?>
-                        </small>
-                    </div>
-                    <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/auto-update">
-                        <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
-                        <button class="btn btn-sm <?= $bot['auto_update'] ? 'btn-outline' : 'btn-primary' ?>">
-                            <?= $bot['auto_update'] ? 'Desactivar' : 'Activar' ?>
-                        </button>
-                    </form>
+                <h3>Logs</h3>
+                <div style="display:flex;align-items:center;gap:.5rem">
+                    <button class="btn btn-xs btn-ghost" onclick="downloadLogs()" title="Descargar logs">⬇ Descargar</button>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="autoRefresh" checked>
+                        <span>Auto</span>
+                    </label>
                 </div>
+            </div>
+            <div class="card-body p-0">
+                <pre class="log-output" id="logOutput">Cargando...</pre>
             </div>
         </div>
         <?php endif; ?>
-
-        <!-- Deploy manual -->
-        <div class="card">
-            <div class="card-header"><h3>Despliegue</h3></div>
-            <div class="card-body">
-                <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/deploy">
-                    <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
-                    <button type="submit" class="btn btn-primary">
-                        <?= $isDeployed ? 'Re-desplegar' : 'Desplegar ahora' ?>
-                    </button>
-                    <small class="form-hint" style="display:block; margin-top:.5rem">Re-despliega el bot con la configuración actual.</small>
-                </form>
-            </div>
-        </div>
     </div>
 
-    <!-- Right column: stats + logs -->
+    <!-- Right column -->
     <div class="bot-sidebar">
 
         <!-- Stats -->
@@ -212,6 +183,60 @@ $platformIcons = [
             </div>
         </div>
 
+        <!-- Deploy manual + Auto-actualización -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:stretch">
+        <div class="card" style="margin:0">
+            <div class="card-header"><h3>Despliegue</h3></div>
+            <div class="card-body">
+                <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/deploy">
+                    <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
+                    <button type="submit" class="btn btn-primary">
+                        <?= $isDeployed ? 'Re-lanzar' : 'Desplegar ahora' ?>
+                    </button>
+                    
+                </form>
+            </div>
+        </div>
+
+        <!-- Auto-actualización -->
+        <?php if ($template && !empty($template['auto_update_supported'])): ?>
+        <div class="card" style="margin:0">
+            <div class="card-header">
+                <h3>Auto-actualización</h3>
+            </div>
+            <div class="card-body">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div>
+                        <p style="margin:0 0 .25rem">
+                            <?php if ($bot['auto_update']): ?>
+                                <span class="badge badge-success">Activada</span>
+                            <?php else: ?>
+                                <span class="badge badge-warning">Desactivada</span>
+                            <?php endif; ?>
+                        </p>
+                        <small class="text-muted">
+                            
+                            Versión actual: <strong>v<?= \App\Core\View::e($bot['current_version'] ?? '1.0.0') ?></strong>
+                            <?php if (!empty($bot['last_updated_at'])): ?>
+                                · Última actualización: <?= date('d/m/Y H:i', strtotime($bot['last_updated_at'])) ?>
+                            <?php endif; ?>
+                        </small>
+                    </div>
+                    <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/auto-update">
+                        <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
+                        <button class="btn btn-sm <?= $bot['auto_update'] ? 'btn-outline' : 'btn-primary' ?>">
+                            <?= $bot['auto_update'] ? 'Desactivar' : 'Activar' ?>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <?php else: ?>
+        <div></div>
+        <?php endif; ?>
+        </div>
+        <br/>
+
         <!-- Ayuda rápida -->
         <?php if ($template && !empty($template['setup_instructions'])): ?>
         <div class="card">
@@ -223,29 +248,27 @@ $platformIcons = [
             </div>
         </div>
         <?php endif; ?>
-
-        <!-- Logs -->
-        <?php if ($isDeployed): ?>
-        <div class="card card-logs">
-            <div class="card-header">
-                <h3>Logs</h3>
-                <label class="toggle-label">
-                    <input type="checkbox" id="autoRefresh" checked>
-                    <span>Auto</span>
-                </label>
-            </div>
-            <div class="card-body p-0">
-                <pre class="log-output" id="logOutput">Cargando...</pre>
-            </div>
-        </div>
-        <?php endif; ?>
     </div>
 </div>
+
+<script>
+(function() {
+    var ta = document.getElementById('envVarsTextarea');
+    if (!ta) return;
+    function autoResize() {
+        ta.style.height = 'auto';
+        ta.style.height = (ta.scrollHeight) + 'px';
+    }
+    ta.addEventListener('input', autoResize);
+    autoResize();
+})();
+</script>
 
 <?php if ($isDeployed): ?>
 <script>
 const BOT_ID = <?= $bot['id'] ?>;
 const BASE   = '<?= APP_URL ?>';
+const CSRF   = '<?= \App\Core\Auth::csrfToken() ?>';
 let logTimer = null;
 let statsTimer = null;
 
@@ -288,6 +311,34 @@ async function fetchLogs() {
     } catch(e) {}
 }
 
+function downloadLogs() {
+    const content = document.getElementById('logOutput').textContent;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'bot-<?= $bot['id'] ?>-logs.txt';
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+function renderActionButtons(s) {
+    const actions = document.getElementById('botActions');
+    if (!actions) return;
+    const isRunning     = s && s.startsWith('running');
+    const isTransitional = s && ['deploying','starting','stopping','restarting'].some(x => s.startsWith(x));
+    const stopForm      = `<form method="POST" action="${BASE}/bots/${BOT_ID}/stop" style="display:inline"><input type="hidden" name="_csrf" value="${CSRF}"><button class="btn btn-sm btn-outline">Stop</button></form>`;
+    const restartForm   = `<form method="POST" action="${BASE}/bots/${BOT_ID}/restart" style="display:inline"><input type="hidden" name="_csrf" value="${CSRF}"><button class="btn btn-sm btn-outline">Restart</button></form>`;
+    const startForm     = `<form method="POST" action="${BASE}/bots/${BOT_ID}/start" style="display:inline"><input type="hidden" name="_csrf" value="${CSRF}"><button class="btn btn-sm btn-outline">Start</button></form>`;
+    const transitional  = `<span class="btn btn-sm btn-outline" style="opacity:0.5;cursor:wait;">${s.charAt(0).toUpperCase() + s.slice(1)}...</span>`;
+    const deleteBtn     = `<a href="${BASE}/bots/${BOT_ID}/delete" class="btn btn-sm btn-danger">Eliminar</a>`;
+    const filesBtn      = `<a href="${BASE}/bots/${BOT_ID}/files" class="btn btn-sm btn-outline">📁 Archivos</a>`;
+    let html = '';
+    if (isRunning)          html = stopForm + ' ' + restartForm;
+    else if (isTransitional) html = transitional;
+    else                    html = startForm;
+    actions.innerHTML = html + ' ' + deleteBtn + ' ' + filesBtn;
+}
+
 async function refreshStats() {
     try {
         const r = await fetch(BASE + '/bots/' + BOT_ID + '/stats');
@@ -305,6 +356,8 @@ async function refreshStats() {
                 hdr.textContent = statusLabel(d.status);
                 hdr.className = 'bot-status ' + statusClass(d.status);
             }
+            // Actualizar botones de acción
+            renderActionButtons(d.status);
         }
     } catch(e) {}
 }

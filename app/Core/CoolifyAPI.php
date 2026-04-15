@@ -256,6 +256,7 @@ class CoolifyAPI
     {
         return self::request('PATCH', '/applications/' . $appUuid . '/storages', [
             'uuid'    => $storageUuid,
+            'type'    => 'file',
             'content' => $content,
         ]);
     }

@@ -270,7 +270,7 @@ code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: .85em; backgro
 .status-unknown   { background: #e9ecef; color: #495057; }
 
 /* ---- Bot detail layout ---- */
-.bot-layout { display: grid; grid-template-columns: 1fr 360px; gap: 1.5rem; align-items: start; }
+.bot-layout { display: grid; grid-template-columns: 3fr 2fr; gap: 1.5rem; align-items: start; }
 .bot-actions { display: flex; gap: .5rem; align-items: center; }
 
 /* ---- Upload zone ---- */

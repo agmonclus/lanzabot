@@ -104,7 +104,10 @@ $hasFiles = !empty($fileStorages);
     <!-- Editor principal -->
     <div class="files-editor">
         <?php if ($activeFile): ?>
-            <?php $activePath = $activeFile['mount_path'] ?? $activeFile['fs_path'] ?? ''; ?>
+            <?php
+            $activePath = $activeFile['mount_path'] ?? $activeFile['fs_path'] ?? '';
+            $activeExt  = strtolower(pathinfo($activePath, PATHINFO_EXTENSION));
+            ?>
             <div class="card">
                 <div class="card-header">
                     <h3><?= \App\Core\View::e(basename($activePath)) ?></h3>
@@ -114,7 +117,8 @@ $hasFiles = !empty($fileStorages);
                     <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/files/update" id="editorForm">
                         <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
                         <input type="hidden" name="storage_uuid" value="<?= \App\Core\View::e($activeFile['uuid'] ?? '') ?>">
-                        <textarea name="content" class="code-editor-full" id="codeEditor" spellcheck="false"><?= \App\Core\View::e($activeFile['content'] ?? '') ?></textarea>
+                        <input type="hidden" name="content" id="codeContent" value="<?= \App\Core\View::e($activeFile['content'] ?? '') ?>">
+                        <div id="aceEditor" style="width:100%;height:520px;"></div>
                         <div class="editor-toolbar">
                             <div class="editor-info">
                                 <span class="text-muted" id="lineCount">Líneas: <?= substr_count($activeFile['content'] ?? '', "\n") + 1 ?></span>
@@ -231,25 +235,10 @@ $hasFiles = !empty($fileStorages);
     margin-top: .25rem;
 }
 
-/* Code editor */
-.code-editor-full {
-    width: 100%;
-    min-height: 450px;
-    padding: 1rem;
-    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-    font-size: .85rem;
-    line-height: 1.55;
-    border: none;
+/* Ace Editor wrapper */
+#aceEditor {
     border-bottom: 1px solid var(--border);
-    outline: none;
-    resize: vertical;
-    background: #fafafa;
-    tab-size: 4;
-    color: var(--text);
-}
-.code-editor-full:focus {
-    background: #fff;
-    box-shadow: inset 0 0 0 2px var(--accent-lt);
+    font-size: .85rem;
 }
 
 /* Editor toolbar */
@@ -280,31 +269,60 @@ $hasFiles = !empty($fileStorages);
 }
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.36.5/ace.min.js"></script>
 <script>
-// Estadísticas del editor en tiempo real
-const editor = document.getElementById('codeEditor');
-if (editor) {
-    editor.addEventListener('input', function() {
-        const lines = this.value.split('\n').length;
-        const chars = this.value.length;
-        document.getElementById('lineCount').textContent = 'Líneas: ' + lines;
-        document.getElementById('charCount').textContent = 'Chars: ' + chars;
-    });
+(function () {
+    var extModeMap = {
+        'py': 'python', 'js': 'javascript', 'ts': 'typescript', 'go': 'golang',
+        'json': 'json', 'yml': 'yaml', 'yaml': 'yaml', 'sh': 'sh', 'bash': 'sh',
+        'md': 'markdown', 'html': 'html', 'css': 'css', 'php': 'php',
+        'rb': 'ruby', 'rs': 'rust', 'java': 'java',
+        'cpp': 'c_cpp', 'c': 'c_cpp', 'sql': 'sql',
+        'xml': 'xml', 'toml': 'toml', 'ini': 'ini', 'env': 'sh'
+    };
 
-    // Soporte Tab en el editor
-    editor.addEventListener('keydown', function(e) {
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            const start = this.selectionStart;
-            const end = this.selectionEnd;
-            this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
-            this.selectionStart = this.selectionEnd = start + 4;
-        }
-        // Ctrl+S / Cmd+S para guardar
-        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-            e.preventDefault();
+    var aceEditorEl = document.getElementById('aceEditor');
+    if (!aceEditorEl) return;
+
+    var fileExt = '<?= addslashes($activeExt ?? '') ?>';
+    var mode    = extModeMap[fileExt] || 'text';
+
+    var editor = ace.edit('aceEditor');
+    editor.setTheme('ace/theme/monokai');
+    editor.session.setMode('ace/mode/' + mode);
+    editor.setOptions({
+        fontSize: '0.85rem',
+        tabSize: 4,
+        useSoftTabs: true,
+        showPrintMargin: false,
+        wrap: false,
+        enableBasicAutocompletion: true,
+        enableLiveAutocompletion: false
+    });
+    editor.setValue(document.getElementById('codeContent').value, -1);
+    editor.focus();
+
+    // Estadísticas en tiempo real
+    function updateStats() {
+        document.getElementById('lineCount').textContent = 'Líneas: ' + editor.session.getLength();
+        document.getElementById('charCount').textContent = 'Chars: ' + editor.getValue().length;
+    }
+    updateStats();
+    editor.session.on('change', updateStats);
+
+    // Ctrl+S / Cmd+S para guardar
+    editor.commands.addCommand({
+        name: 'save',
+        bindKey: { win: 'Ctrl-S', mac: 'Command-S' },
+        exec: function () {
+            document.getElementById('codeContent').value = editor.getValue();
             document.getElementById('editorForm').submit();
         }
     });
-}
+
+    // Sincronizar al enviar el formulario
+    document.getElementById('editorForm').addEventListener('submit', function () {
+        document.getElementById('codeContent').value = editor.getValue();
+    });
+}());
 </script>
