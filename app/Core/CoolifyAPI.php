@@ -157,6 +157,15 @@ class CoolifyAPI
         return self::request('POST', '/applications/' . $uuid . '/start');
     }
 
+    /**
+     * Fuerza un deploy completo (rebuild) de la aplicación.
+     * Esto reescribe los file storages desde la BD de Coolify al disco del host.
+     */
+    public static function forceDeployApplication(string $uuid): array
+    {
+        return self::request('POST', '/applications/' . $uuid . '/start?force=true');
+    }
+
     public static function stopApplication(string $uuid): array
     {
         return self::request('POST', '/applications/' . $uuid . '/stop');

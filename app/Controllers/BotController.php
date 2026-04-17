@@ -340,8 +340,10 @@ class BotController
         $bot  = $this->getBot((int) $id, $user['id']);
 
         if ($bot['coolify_app_uuid']) {
-            CoolifyAPI::restartApplication($bot['coolify_app_uuid']);
-            Bot::update($bot['id'], ['coolify_status' => 'restarting']);
+            CoolifyAPI::stopApplication($bot['coolify_app_uuid']);
+            sleep(2);
+            CoolifyAPI::startApplication($bot['coolify_app_uuid']);
+            Bot::update($bot['id'], ['coolify_status' => 'starting']);
         }
         View::redirect('/bots/' . $id);
     }
@@ -650,22 +652,36 @@ class BotController
         }
 
         $storageUuid = $_POST['storage_uuid'] ?? '';
+        $mountPath   = $_POST['mount_path'] ?? '';
         $content     = $_POST['content'] ?? '';
 
-        if (!$storageUuid) {
+        if (!$storageUuid || !$mountPath) {
             Auth::flash('error', 'Archivo no especificado.');
             View::redirect('/bots/' . $id . '/files');
             return;
         }
 
-        $result = CoolifyAPI::updateFileStorage($bot['coolify_app_uuid'], $storageUuid, $content);
-        if (($result['_status'] ?? 0) >= 200 && ($result['_status'] ?? 0) < 300) {
-            Auth::flash('success', 'Archivo guardado. Reinicia el bot para aplicar cambios.');
+        // La API PATCH de Coolify actualiza el contenido en BD pero NO lo escribe
+        // al disco del host (bug en Coolify). Workaround: DELETE + CREATE.
+        // El POST (create) sí llama a saveStorageOnServer() y escribe al disco.
+        CoolifyAPI::deleteStorage($bot['coolify_app_uuid'], $storageUuid);
+        $result = CoolifyAPI::createFileStorage($bot['coolify_app_uuid'], $mountPath, $content);
+
+        if (!empty($result['uuid']) || (($result['_status'] ?? 0) >= 200 && ($result['_status'] ?? 0) < 300)) {
+            // Reiniciar el bot para que use el archivo actualizado.
+            // No necesita rebuild completo — el archivo ya está en disco.
+            CoolifyAPI::stopApplication($bot['coolify_app_uuid']);
+            sleep(2);
+            CoolifyAPI::startApplication($bot['coolify_app_uuid']);
+            Bot::update($bot['id'], ['coolify_status' => 'starting']);
+            Auth::flash('success', 'Archivo guardado y bot reiniciando con los cambios.');
+            $newUuid = $result['uuid'] ?? '';
         } else {
             Auth::flash('error', 'Error al guardar: ' . ($result['message'] ?? json_encode($result)));
+            $newUuid = '';
         }
 
-        View::redirect('/bots/' . $id . '/files?file=' . urlencode($storageUuid));
+        View::redirect('/bots/' . $id . '/files' . ($newUuid ? '?file=' . urlencode($newUuid) : ''));
     }
 
     public function deleteFile(string $id): void

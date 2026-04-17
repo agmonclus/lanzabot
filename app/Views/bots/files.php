@@ -117,6 +117,7 @@ $hasFiles = !empty($fileStorages);
                     <form method="POST" action="<?= APP_URL ?>/bots/<?= $bot['id'] ?>/files/update" id="editorForm">
                         <input type="hidden" name="_csrf" value="<?= \App\Core\Auth::csrfToken() ?>">
                         <input type="hidden" name="storage_uuid" value="<?= \App\Core\View::e($activeFile['uuid'] ?? '') ?>">
+                        <input type="hidden" name="mount_path" value="<?= \App\Core\View::e($activeFile['mount_path'] ?? '') ?>">
                         <input type="hidden" name="content" id="codeContent" value="<?= \App\Core\View::e($activeFile['content'] ?? '') ?>">
                         <div id="aceEditor" style="width:100%;height:520px;"></div>
                         <div class="editor-toolbar">
