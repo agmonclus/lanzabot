@@ -173,3 +173,41 @@ Las credenciales de cada bot (tokens de plataforma, API keys de exchanges, etc.)
 - Bots de IA pesados (Ollama, Dify) requieren **plan pro** y 2-4 GB RAM. No desplegar en planes free/starter.
 - Templates de **frameworks** (grammY, Telegraf, matrix-nio, Telebot Go) no tienen `git_repo_url` → necesitan que el usuario suba su propio código.
 - Aplicaciones complejas (Dify, Bagisto, Saleor) pueden necesitar **servicios adjuntos** (PostgreSQL, Redis) que se configuran en Coolify como servicios en la misma red interna.
+
+---
+
+## Centinela `__COOLIFY_FQDN__`
+
+Cuando un template necesita conocer su propio dominio público (p.ej. n8n para `N8N_HOST`, `WEBHOOK_URL`, `N8N_EDITOR_BASE_URL`), se ponen centinelas en `default_env_vars`. El `BotController` los resuelve automáticamente tras crear la aplicación en Coolify:
+
+| Centinela | Valor resuelto | Uso típico |
+|---|---|---|
+| `__COOLIFY_FQDN__` | URL completa con protocolo: `http://uuid.dominio.io` | `WEBHOOK_URL`, `N8N_EDITOR_BASE_URL` |
+| `__COOLIFY_HOST__` | Solo hostname sin protocolo: `uuid.dominio.io` | `N8N_HOST` (n8n falla si recibe `http://` aquí) |
+
+El flujo es:
+1. Detecta si algún valor de `$envVars` es `__COOLIFY_FQDN__` o `__COOLIFY_HOST__`.
+2. Llama a `CoolifyAPI::getApplication($uuid)` y extrae el campo `fqdn`.
+3. Reemplaza todos los centinelas, actualiza la BD (`Bot::setEnvVars`) y reenvía las vars a Coolify (`CoolifyAPI::updateEnvVars`) **antes** del deploy final.
+
+Usar estos centinelas en cualquier template futuro que exponga una URL pública. **No pedir el dominio al usuario en el formulario.**
+
+---
+
+## Configuración correcta del template n8n (id=51)
+
+Variables críticas que deben estar en `default_env_vars` para que n8n arranque sin crash loop:
+
+| Variable | Valor por defecto | Motivo |
+|---|---|---|
+| `DB_TYPE` | `sqlite` | Sin esto n8n puede intentar conectar a un host externo y hacer timeout |
+| `N8N_HOST` | `__COOLIFY_HOST__` | Solo hostname sin `http://`; n8n crashea si recibe URL completa |
+| `WEBHOOK_URL` | `__COOLIFY_FQDN__` | Base URL para webhooks de workflows |
+| `N8N_EDITOR_BASE_URL` | `__COOLIFY_FQDN__` | URL del editor en producción |
+| `N8N_BASIC_AUTH_ACTIVE` | `true` | Habilitar autenticación básica |
+| `GENERIC_TIMEZONE` | `Europe/Madrid` | Zona horaria para disparadores cron |
+
+**Variables obsoletas — NO incluir:**
+- `N8N_RUNNERS_ENABLED` — eliminada en n8n 1.x reciente; la app muestra un aviso de deprecación y pide quitarla. El warning "Python 3 is missing" persiste en el log pero no afecta al funcionamiento.
+
+Los mensajes `[license SDK] Skipping renewal on init` y `Last session crashed` son **normales** en Community Edition; no son errores críticos por sí solos. `Last session crashed` aparece en cada reinicio del contenedor porque n8n detecta que el proceso anterior no terminó limpiamente.

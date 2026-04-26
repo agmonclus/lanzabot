@@ -70,7 +70,7 @@ class CoolifyAPI
         ]);
     }
 
-    public static function createApplication(string $botName, string $dockerImage, array $envVars = [], int $ramMb = 128): array
+    public static function createApplication(string $botName, string $dockerImage, array $envVars = [], int $ramMb = 128, int $port = 8080): array
     {
         $result = self::request('POST', '/applications/dockerimage', [
             'project_uuid'               => COOLIFY_PROJECT_UUID,
@@ -78,7 +78,7 @@ class CoolifyAPI
             'environment_name'           => 'production',
             'name'                       => 'bot-' . $botName,
             'docker_registry_image_name' => $dockerImage,
-            'ports_exposes'              => '8080',
+            'ports_exposes'              => (string) $port,
             'instant_deploy'             => false,
             'limits_memory'              => $ramMb . 'm',
             'limits_cpus'                => '0.5',
@@ -96,7 +96,7 @@ class CoolifyAPI
      * Crea una aplicación desde un Dockerfile inline (base64).
      * Usado para bots framework que necesitan instalar dependencias y ejecutar código propio.
      */
-    public static function createDockerfileApplication(string $botName, string $dockerfileContent, array $envVars = [], int $ramMb = 128): array
+    public static function createDockerfileApplication(string $botName, string $dockerfileContent, array $envVars = [], int $ramMb = 128, int $port = 8080): array
     {
         $result = self::request('POST', '/applications/dockerfile', [
             'project_uuid'     => COOLIFY_PROJECT_UUID,
@@ -104,7 +104,7 @@ class CoolifyAPI
             'environment_name' => 'production',
             'name'             => 'bot-' . $botName,
             'dockerfile'       => base64_encode($dockerfileContent),
-            'ports_exposes'    => '8080',
+            'ports_exposes'    => (string) $port,
             'instant_deploy'   => false,
             'limits_memory'    => $ramMb . 'm',
             'limits_cpus'      => '0.5',
@@ -117,7 +117,7 @@ class CoolifyAPI
         return $result;
     }
 
-    public static function createPublicApplication(string $botName, string $gitRepoUrl, array $envVars = [], int $ramMb = 128, string $buildPack = 'nixpacks', string $gitBranch = 'main', ?string $installCommand = null): array
+    public static function createPublicApplication(string $botName, string $gitRepoUrl, array $envVars = [], int $ramMb = 128, string $buildPack = 'nixpacks', string $gitBranch = 'main', ?string $installCommand = null, int $port = 8080): array
     {
         $payload = [
             'project_uuid'     => COOLIFY_PROJECT_UUID,
@@ -127,7 +127,7 @@ class CoolifyAPI
             'git_repository'   => $gitRepoUrl,
             'git_branch'       => $gitBranch,
             'build_pack'       => $buildPack,
-            'ports_exposes'    => '8080',
+            'ports_exposes'    => (string) $port,
             'instant_deploy'   => false,
             'limits_memory'    => $ramMb . 'm',
             'limits_cpus'      => '0.5',

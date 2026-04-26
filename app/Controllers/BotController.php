@@ -149,13 +149,14 @@ class BotController
             $gitBranch      = $template['git_branch'] ?? 'main';
             $installCommand = $template['install_command'] ?? null;
             $startCommand   = $template['start_command'] ?? null;
+            $port           = (int) ($template['exposed_port'] ?? 8080);
             if (!empty($gitRepoUrl)) {
-                $result = CoolifyAPI::createPublicApplication($slug, $gitRepoUrl, $envVars, $ramMb, 'nixpacks', $gitBranch, $installCommand);
+                $result = CoolifyAPI::createPublicApplication($slug, $gitRepoUrl, $envVars, $ramMb, 'nixpacks', $gitBranch, $installCommand, $port);
             } elseif (!empty($startCommand)) {
                 $dockerfile = $this->buildFrameworkDockerfile($template);
-                $result = CoolifyAPI::createDockerfileApplication($slug, $dockerfile, $envVars, $ramMb);
+                $result = CoolifyAPI::createDockerfileApplication($slug, $dockerfile, $envVars, $ramMb, $port);
             } else {
-                $result = CoolifyAPI::createApplication($slug, $template['docker_image'], $envVars, $ramMb);
+                $result = CoolifyAPI::createApplication($slug, $template['docker_image'], $envVars, $ramMb, $port);
             }
 
             if (!empty($result['uuid'])) {
@@ -163,6 +164,24 @@ class BotController
                     'coolify_app_uuid' => $result['uuid'],
                     'coolify_status'   => 'deploying',
                 ]);
+
+                // Resolver variables con centinela __COOLIFY_FQDN__
+                // Si alguna env var tiene ese valor, lo reemplazamos con el FQDN asignado por Coolify
+                if (in_array('__COOLIFY_FQDN__', array_values($envVars), true)) {
+                    $appDetails = CoolifyAPI::getApplication($result['uuid']);
+                    $fqdn = $appDetails['fqdn'] ?? null;
+                    if ($fqdn) {
+                        // Coolify devuelve el fqdn con protocolo; lo normalizamos sin barra final
+                        $fqdn = rtrim($fqdn, '/');
+                        foreach ($envVars as $k => $v) {
+                            if ($v === '__COOLIFY_FQDN__') {
+                                $envVars[$k] = $fqdn;
+                            }
+                        }
+                        Bot::setEnvVars($botId, $envVars);
+                        CoolifyAPI::updateEnvVars($result['uuid'], $envVars);
+                    }
+                }
 
                 // Configurar almacenamiento y código inicial si la plantilla lo requiere
                 $this->setupStorage($result['uuid'], $botId, $template);
