@@ -69,6 +69,17 @@ $router->get('/billing',         'BillingController@index');
 $router->get('/billing/portal',  'BillingController@portal');
 $router->post('/stripe/webhook', 'BillingController@webhook');
 
+// Databases
+$router->get('/databases',                          'DatabaseController@index');
+$router->get('/databases/create',                   'DatabaseController@create');
+$router->post('/databases',                         'DatabaseController@store');
+$router->get('/databases/{id}',                     'DatabaseController@show');
+$router->post('/databases/{id}/password',           'DatabaseController@regeneratePassword');
+$router->get('/databases/{id}/export',              'DatabaseController@export');
+$router->post('/databases/{id}/import',             'DatabaseController@import');
+$router->get('/databases/{id}/delete',              'DatabaseController@confirmDelete');
+$router->post('/databases/{id}/delete',             'DatabaseController@destroy');
+
 // Help
 $router->get('/help',              'HelpController@index');
 $router->get('/help/guide/{slug}', 'HelpController@guide');

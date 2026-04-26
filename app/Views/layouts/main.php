@@ -24,6 +24,10 @@
                 <svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2zm1 5a1 1 0 100 2h12a1 1 0 100-2H4z"/></svg>
                 Dashboard
             </a>
+            <a href="<?= APP_URL ?>/databases" class="nav-link <?= str_contains($_SERVER['REQUEST_URI'], '/databases') ? 'active' : '' ?>">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3zm10.905-3.222C15.206 9.285 16 9.634 16 10c0 1.105-2.686 2-6 2s-6-.895-6-2c0-.366.794-.715 2.095-1.222A9.98 9.98 0 0010 9a9.98 9.98 0 003.905-.222zM10 4C6.686 4 4 4.895 4 6s2.686 2 6 2 6-.895 6-2-2.686-2-6-2z"/></svg>
+                Bases de datos
+            </a>
             <a href="<?= APP_URL ?>/plans"      class="nav-link <?= str_contains($_SERVER['REQUEST_URI'], '/plans') ? 'active' : '' ?>">
                 <svg viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm6-8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2h-2zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/></svg>
                 Planes

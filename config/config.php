@@ -42,6 +42,23 @@ define('COOLIFY_API_KEY',      $_ENV['COOLIFY_API_KEY'] ?? '');
 define('COOLIFY_SERVER_UUID',  $_ENV['COOLIFY_SERVER_UUID'] ?? '');
 define('COOLIFY_PROJECT_UUID', $_ENV['COOLIFY_PROJECT_UUID'] ?? '');
 
+// Recursos de base de datos compartidos en Coolify
+define('COOLIFY_POSTGRESQL_UUID', $_ENV['COOLIFY_POSTGRESQL_UUID'] ?? '');
+define('COOLIFY_MONGODB_UUID',    $_ENV['COOLIFY_MONGODB_UUID']    ?? '');
+
+// Conexión directa al servidor PostgreSQL compartido (para crear/eliminar BDs lógicas)
+define('SHARED_PG_HOST',       $_ENV['SHARED_PG_HOST']       ?? '');
+define('SHARED_PG_PORT',       (int)($_ENV['SHARED_PG_PORT'] ?? 5432));
+define('SHARED_PG_ADMIN_USER', $_ENV['SHARED_PG_ADMIN_USER'] ?? 'postgres');
+define('SHARED_PG_ADMIN_PASS', $_ENV['SHARED_PG_ADMIN_PASS'] ?? '');
+define('SHARED_PG_ADMIN_DB',   $_ENV['SHARED_PG_ADMIN_DB']   ?? 'postgres');
+
+// Conexión directa al servidor MongoDB compartido
+define('SHARED_MONGO_HOST',       $_ENV['SHARED_MONGO_HOST']       ?? '');
+define('SHARED_MONGO_PORT',       (int)($_ENV['SHARED_MONGO_PORT'] ?? 27017));
+define('SHARED_MONGO_ADMIN_USER', $_ENV['SHARED_MONGO_ADMIN_USER'] ?? 'root');
+define('SHARED_MONGO_ADMIN_PASS', $_ENV['SHARED_MONGO_ADMIN_PASS'] ?? '');
+
 define('UPLOAD_PATH', dirname(__DIR__) . '/uploads');
 define('MAX_UPLOAD_SIZE', 50 * 1024 * 1024); // 50 MB
 

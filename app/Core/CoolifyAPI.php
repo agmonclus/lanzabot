@@ -285,6 +285,33 @@ class CoolifyAPI
         return self::request('GET', '/servers');
     }
 
+    // ---- Database resources (recursos de BD gestionados por Coolify) ----
+
+    /**
+     * Devuelve los detalles de un recurso de base de datos en Coolify.
+     * Útil para verificar el estado y obtener la URL interna del servicio.
+     */
+    public static function getDatabaseResource(string $uuid): array
+    {
+        return self::request('GET', '/databases/' . $uuid);
+    }
+
+    /**
+     * Inicia un recurso de base de datos en Coolify.
+     */
+    public static function startDatabaseResource(string $uuid): array
+    {
+        return self::request('POST', '/databases/' . $uuid . '/start');
+    }
+
+    /**
+     * Para un recurso de base de datos en Coolify.
+     */
+    public static function stopDatabaseResource(string $uuid): array
+    {
+        return self::request('POST', '/databases/' . $uuid . '/stop');
+    }
+
     // ---- Docker Compose builder ----
 
     private static function buildDockerCompose(string $name, string $image, int $ramMb, array $envVars): string
